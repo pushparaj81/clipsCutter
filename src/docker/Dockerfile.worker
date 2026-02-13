@@ -1,0 +1,19 @@
+FROM node:18-alpine
+
+# Install system dependencies
+RUN apk add --no-cache python3 py3-pip ffmpeg
+
+# Install yt-dlp
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+RUN pip install yt-dlp
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npx prisma generate
+
+CMD ["npm", "run", "worker"]

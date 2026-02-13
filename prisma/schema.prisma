@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Clip {
+  id          String   @id @default(uuid())
+  videoId     String
+  originalUrl String
+  startTime   Float
+  endTime     Float
+  status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  filePath    String?
+  downloadUrl String?
+  createdAt   DateTime @default(now())
+}

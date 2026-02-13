@@ -1,0 +1,23 @@
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+export interface SliderProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <input
+        type="range"
+        className={cn(
+          "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-primary",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Slider.displayName = "Slider"
+
+export { Slider }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { clipsQueue } from '@/lib/queue';
 import { ClipJobData } from '@/lib/queue';
+import { getVideoInfo } from '@/lib/video';
 
 export async function POST(request: NextRequest) {
     try {
@@ -10,8 +11,6 @@ export async function POST(request: NextRequest) {
 
         console.log('--- API /api/clips ---');
         console.log('  URL:', url);
-        console.log('  Time:', startTime, '->', endTime);
-        console.log('  Format:', format, '| Quality:', quality);
 
         // Validate required fields
         if (!url || !startTime || !endTime) {
@@ -21,7 +20,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Step 1: Create a record in the database
+        // NEW: Fetch video info here so we have the title immediately
+        console.log('  Fetching title metadata...');
+        const videoInfo = await getVideoInfo(url);
+        const title = videoInfo.title || 'Untitled Clip';
+
+        // Step 1: Create a record in the database with the title
         const clip = await prisma.clip.create({
             data: {
                 youtubeUrl: url,
@@ -29,9 +33,10 @@ export async function POST(request: NextRequest) {
                 endTime,
                 format,
                 quality,
+                title,
             },
         });
-        console.log('  Created Clip Record:', clip.id);
+        console.log('  Created Clip Record:', clip.id, '| Title:', title);
 
         // Step 2: Add the job to the queue
         const jobData: ClipJobData = {

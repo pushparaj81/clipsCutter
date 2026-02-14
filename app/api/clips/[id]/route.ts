@@ -23,6 +23,7 @@ export async function GET(
         }
 
         console.log(`  Status: ${clip.status}`);
+        if (clip.title) console.log(`  Title: ${clip.title}`);
         if (clip.downloadUrl) console.log(`  Download: ${clip.downloadUrl}`);
         if (clip.error) console.log(`  Error: ${clip.error}`);
 

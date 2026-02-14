@@ -94,13 +94,17 @@ async function processClipJob(job: Job<ClipJobData>) {
 
         // Step 5: Update DB with the download link
         const publicDownloadUrl = `/clips/${outputFileName}`;
+        const finalTitle = metadata.title || 'Untitled Clip';
+        console.log(`    [5/5] Full Metadata Title: "${metadata.title}"`);
+        console.log(`    [5/5] Updating DB with title: "${finalTitle}"`);
+
         await prisma.clip.update({
             where: { id: clipId },
             data: {
                 status: 'COMPLETED',
                 downloadUrl: publicDownloadUrl,
                 storagePath: outputPath,
-                title: metadata.title || 'Untitled Clip',
+                title: finalTitle,
             },
         });
         console.log(`    [5/5] Job COMPLETED! Download: ${publicDownloadUrl}`);

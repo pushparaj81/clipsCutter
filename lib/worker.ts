@@ -41,11 +41,11 @@ async function processClipJob(job: Job<ClipJobData>) {
 
         // Step 2: Get the best direct download URL from yt-dlp
         const isAudioOnly = format === 'mp3';
+        const height = quality === 'best' ? '' : `[height<=${quality.replace('p', '')}]`;
+
         const formatSelector = isAudioOnly
-            ? 'bestaudio'
-            : quality === 'best'
-                ? 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
-                : `bestvideo[height<=${quality.replace('p', '')}][ext=mp4]+bestaudio[ext=m4a]/best[height<=${quality.replace('p', '')}]/best`;
+            ? 'bestaudio/best'
+            : `bestvideo${height}+bestaudio/best${height}/best`;
 
         console.log(`    [2/5] Fetching download URL (format: ${formatSelector})...`);
 
@@ -55,11 +55,29 @@ async function processClipJob(job: Job<ClipJobData>) {
             format: formatSelector,
         }) as any;
 
-        const downloadUrl = metadata.url || metadata.requested_downloads?.[0]?.url;
+        // Log keys for debugging
+        console.log(`    [2/5] yt-dlp Metadata Keys: ${Object.keys(metadata).join(', ')}`);
+
+        let downloadUrl = metadata.url;
+
+        // If it's a merged format, metadata.url might be missing, check requested_formats
+        if (!downloadUrl && metadata.requested_formats) {
+            console.log(`    [2/5] Merged formats detected: ${metadata.requested_formats.length}`);
+            // If it's merged, we take the one with a URL (or we'll just throw for now to see)
+            downloadUrl = metadata.requested_formats[0]?.url;
+        }
+
+        if (!downloadUrl && metadata.requested_downloads?.[0]?.url) {
+            downloadUrl = metadata.requested_downloads[0].url;
+        }
+
         if (!downloadUrl) {
+            console.log('    [2/5] Error: metadata.url is missing.');
+            // Dump the first 500 chars of metadata to log
+            console.log('    [2/5] Metadata snippet:', JSON.stringify(metadata).substring(0, 500) + '...');
             throw new Error('Could not find a suitable download URL from yt-dlp');
         }
-        console.log(`    [2/5] Download URL obtained.`);
+        console.log(`    [2/5] Download URL obtained: ${downloadUrl.substring(0, 50)}...`);
 
         // Step 3: Build output file path
         const safeTitle = (metadata.title || 'clip')
@@ -82,6 +100,7 @@ async function processClipJob(job: Job<ClipJobData>) {
                 status: 'COMPLETED',
                 downloadUrl: publicDownloadUrl,
                 storagePath: outputPath,
+                title: metadata.title || 'Untitled Clip',
             },
         });
         console.log(`    [5/5] Job COMPLETED! Download: ${publicDownloadUrl}`);

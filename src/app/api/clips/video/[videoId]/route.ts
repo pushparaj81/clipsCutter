@@ -1,76 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import fs from 'fs/promises';
-import path from 'path';
 
 export async function GET(
-    request: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ videoId: string }> }
 ) {
     try {
         const { videoId } = await params;
 
-        if (!videoId) {
-            return NextResponse.json({ error: 'Video ID is required' }, { status: 400 });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/video/${videoId}`);
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return NextResponse.json(errorData, { status: response.status });
         }
 
-        const clips = await prisma.clip.findMany({
-            where: { videoId },
-            orderBy: { createdAt: 'desc' },
-        });
-
-        return NextResponse.json(clips);
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error: any) {
-        console.error('Error fetching clips for video:', error);
+        console.error('Video Clips Proxy Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch clips' },
+            { error: 'Failed to fetch video clips' },
             { status: 500 }
         );
     }
 }
 
 export async function DELETE(
-    request: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ videoId: string }> }
 ) {
     try {
         const { videoId } = await params;
 
-        if (!videoId) {
-            return NextResponse.json({ error: 'Video ID is required' }, { status: 400 });
-        }
-
-        // 1. Fetch all clips to get file paths
-        const clips = await prisma.clip.findMany({
-            where: { videoId },
-            select: { id: true, filePath: true }
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/video/${videoId}`, {
+            method: 'DELETE'
         });
 
-        // 2. Delete physical files
-        for (const clip of clips) {
-            if (clip.filePath) {
-                try {
-                    const absolutePath = path.resolve(clip.filePath);
-                    await fs.unlink(absolutePath);
-                    console.log(`[CLEANUP] Deleted file: ${absolutePath}`);
-                } catch (err: any) {
-                    if (err.code !== 'ENOENT') {
-                        console.error(`[CLEANUP] Failed to delete file ${clip.filePath}:`, err.message);
-                    }
-                }
-            }
+        if (!response.ok) {
+            const errorData = await response.json();
+            return NextResponse.json(errorData, { status: response.status });
         }
 
-        // 3. Delete database records
-        await prisma.clip.deleteMany({
-            where: { videoId }
-        });
-
-        return NextResponse.json({ success: true, message: `Cleared ${clips.length} sessions.` });
+        const data = await response.json();
+        return NextResponse.json(data);
     } catch (error: any) {
-        console.error('Error clearing clips for video:', error);
+        console.error('Delete Clips Proxy Error:', error);
         return NextResponse.json(
-            { error: 'Failed to clear clips', details: error.message },
+            { error: 'Failed to delete video clips' },
             { status: 500 }
         );
     }

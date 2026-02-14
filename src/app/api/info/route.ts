@@ -9,29 +9,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    const metadata = await getVideoMetadata(url);
+    // Forward to Python backend
+    const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/info`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
 
-    const videoId = metadata.id || metadata.display_id || new URL(url).searchParams.get('v') || url.split('/').pop()?.split('?')[0];
-    
-    console.log(`Extracted Video ID: ${videoId}, Title: ${metadata.title}`);
-
-    // Extract relevant fields standard for the frontend
-    const info = {
-      videoId,
-      title: metadata.title || 'Untitled Video',
-      thumbnail: metadata.thumbnail || (metadata.thumbnails && metadata.thumbnails.length > 0 ? metadata.thumbnails[metadata.thumbnails.length - 1].url : null),
-      duration: Number(metadata.duration) || 0,
-      availableQualities: metadata.availableQualities,
-      availableFormats: metadata.availableFormats
-    };
-
-    if (!info.videoId) {
-      throw new Error('Could not determine video ID');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to fetch metadata from Python backend');
     }
 
+    const info = await response.json();
     return NextResponse.json(info);
   } catch (error: any) {
-    console.error('Info API Error:', error);
+    console.error('Info Proxy Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch metadata', details: error.message },
       { status: 500 }

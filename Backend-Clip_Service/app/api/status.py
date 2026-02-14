@@ -32,8 +32,13 @@ async def get_clip_status(
         return ClipStatus(
             id=clip.id,
             video_id=clip.videoId,
+            title=clip.title,
             status=clip.status,
             progress=clip.progress,
+            format=clip.format,
+            quality=clip.quality,
+            start_time=clip.startTime,
+            end_time=clip.endTime,
             download_url=clip.downloadUrl,
             error=clip.error,
             file_size=clip.fileSize,

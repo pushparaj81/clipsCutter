@@ -62,8 +62,13 @@ class ClipStatus(BaseModel):
     """Clip status response"""
     id: str
     video_id: str = Field(..., alias="videoId")
+    title: Optional[str] = None
     status: str
     progress: int
+    format: Optional[str] = "mp4"
+    quality: Optional[str] = None
+    start_time: Optional[float] = Field(None, alias="startTime")
+    end_time: Optional[float] = Field(None, alias="endTime")
     download_url: Optional[str] = Field(None, alias="downloadUrl")
     error: Optional[str] = None
     file_size: Optional[int] = Field(None, alias="fileSize")

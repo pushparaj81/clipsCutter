@@ -1,0 +1,18 @@
+[2026-02-13T16:42:04.122Z] Job 65676969-07a1-4a3d-bf67-0cf0cfe68db9 (Clip 65676969-07a1-4a3d-bf67-0cf0cfe68db9) failed: 
+Invalid `prisma.clip.update()` invocation:
+
+
+An operation failed because it depends on one or more records that were required but not found. No record was found for an update.
+PrismaClientKnownRequestError: 
+Invalid `prisma.clip.update()` invocation:
+
+
+An operation failed because it depends on one or more records that were required but not found. No record was found for an update.
+    at zr.handleRequestError (C:\Users\user\Desktop\clipscutter\clipsCutter\node_modules\@prisma\client\src\runtime\RequestHandler.ts:228:13)
+    at zr.handleAndLogRequestError (C:\Users\user\Desktop\clipscutter\clipsCutter\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at zr.request (C:\Users\user\Desktop\clipscutter\clipsCutter\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async a (C:\Users\user\Desktop\clipscutter\clipsCutter\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:807:24)
+    at async Worker.import_bullmq.Worker.connection (C:\Users\user\Desktop\clipscutter\clipsCutter\src\lib\worker.ts:18:7)
+    at async <anonymous> (C:\Users\user\Desktop\clipscutter\clipsCutter\node_modules\bullmq\src\classes\worker.ts:997:26)
+---

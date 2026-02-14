@@ -1,43 +1,34 @@
 "use client";
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Download, AlertCircle, Loader2 } from 'lucide-react';
-import { VideoPreview } from '@/components/VideoPreview';
-import { TimeSelector } from '@/components/TimeSelector';
-import { isValidYoutubeUrl } from '@/utils/validateUrl';
-
-interface VideoInfo {
-  videoId: string;
-  title: string;
-  thumbnail: string;
-  duration: number;
-}
+import { Loader2, AlertCircle, Video, Music, Zap, Search } from 'lucide-react';
+import { isValidYoutubeUrl, extractVideoId } from '@/utils/validateUrl';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null);
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
   const [error, setError] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState('');
+  const router = useRouter();
 
-
-  const fetchMetadata = async () => {
+  const handleFetchInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!url) return;
+    
     if (!isValidYoutubeUrl(url)) {
-      setError('Invalid YouTube URL');
+      setError('Please enter a valid YouTube URL');
+      return;
+    }
+
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      setError('Could not extract Video ID from URL');
       return;
     }
 
     setLoading(true);
     setError('');
-    setVideoInfo(null);
-    setDownloadUrl('');
-
+    
     try {
       const res = await fetch('/api/info', {
         method: 'POST',
@@ -47,135 +38,85 @@ export default function Home() {
       const data = await res.json();
       
       if (data.error) throw new Error(data.error);
-      
-      setVideoInfo(data);
-      setEndTime(data.duration);
-      setStartTime(0);
+
+      // Successfully validated and fetched, store in session for instant load
+      sessionStorage.setItem(`videoData_${videoId}`, JSON.stringify(data));
+
+      // Redirect to the cutter page
+      router.push(`/cutter/${videoId}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch video');
-    } finally {
+      setError(err.message || 'Failed to fetch video details');
       setLoading(false);
     }
   };
 
-  const handleClip = async () => {
-    if (!videoInfo) return;
-    setProcessing(true);
-    setError('');
-    setDownloadUrl('');
-
-    try {
-      const res = await fetch('/api/clip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          videoId: videoInfo.videoId,
-          startTime,
-          endTime
-        })
-      });
-      const data = await res.json();
-
-      if (data.error) throw new Error(data.error);
-      
-      // Poll for status
-      const pollInterval = setInterval(async () => {
-        const statusRes = await fetch(`/api/status?id=${data.clipId}`);
-        const statusData = await statusRes.json();
-
-        if (statusData.status === 'COMPLETED') {
-          clearInterval(pollInterval);
-          setDownloadUrl(statusData.downloadUrl);
-          setProcessing(false);
-        } else if (statusData.status === 'FAILED') {
-          clearInterval(pollInterval);
-          setError(statusData.error || 'Clipping failed');
-          setProcessing(false);
-        }
-      }, 3000); // Poll every 3 seconds
-
-    } catch (err: any) {
-      setError(err.message || 'Clipping failed');
-    } finally {
-      // setProcessing(false); // Handled in poll
-    }
-  };
-
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 flex justify-center items-center gap-2">
-            ClipsCutter
+    <main className="min-h-screen bg-white flex flex-col items-center pt-32 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-4xl w-full space-y-16">
+        {/* Header Section */}
+        <div className="text-center space-y-6">
+          <h1 className="text-7xl font-black text-[#333333] tracking-tighter">
+            YouTube Video Cutter
           </h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Trim YouTube videos instantly. Secure & Fast.
+          <p className="max-w-2xl mx-auto text-2xl text-gray-500 leading-relaxed font-light">
+            Skip the hassle of downloading full videos. Just get your favorite clip by
+            entering a link and selecting your desired duration.
           </p>
         </div>
 
-        {/* URL Input */}
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Paste YouTube URL here..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchMetadata()}
-            className="flex-1"
-          />
-          <Button onClick={fetchMetadata} disabled={loading} size="lg">
-            {loading ? <Loader2 className="animate-spin" /> : 'Fetch'}
-          </Button>
+        {/* Pill Input Container */}
+        <div className="max-w-3xl mx-auto w-full relative">
+          <form onSubmit={handleFetchInfo} className="flex items-center bg-white border-2 border-gray-50 rounded-full p-3 pl-10 shadow-xl hover:shadow-2xl transition-all duration-300 focus-within:shadow-2xl">
+            <input
+              type="text"
+              placeholder="Paste YouTube link here..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="flex-1 bg-transparent border-none text-xl text-gray-600 placeholder:text-gray-300 focus:outline-none focus:ring-0"
+            />
+            <button 
+              type="submit"
+              disabled={loading}
+              className="bg-[#5875F5] hover:bg-[#4763E4] text-white px-12 py-4 rounded-full font-black text-lg tracking-widest transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 shadow-lg"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="animate-spin h-6 w-6" />
+                  {/* <span>Searching...</span> */}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  <span>Search</span>
+                </div>
+              )}
+            </button>
+          </form>
+          
+          {error && (
+            <div className="mt-8 bg-red-50 text-red-600 p-5 rounded-3xl flex items-center justify-center gap-3 border border-red-100 animate-in fade-in slide-in-from-top-4 duration-300">
+              <AlertCircle className="h-6 w-6" />
+              <span className="font-bold text-lg">{error}</span>
+            </div>
+          )}
         </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            {error}
-          </div>
-        )}
-
-        {/* Video Editor Interface */}
-        {videoInfo && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <VideoPreview videoId={videoInfo.videoId} thumbnailUrl={videoInfo.thumbnail} />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Metadata */}
-              <div className="space-y-2">
-                <h3 className="font-semibold text-xl line-clamp-1" title={videoInfo.title}>
-                  {videoInfo.title}
-                </h3>
-              </div>
-
-              {/* Controls */}
-              <TimeSelector
-                startTime={startTime}
-                endTime={endTime}
-                duration={videoInfo.duration}
-                onStartChange={setStartTime}
-                onEndChange={setEndTime}
-                onClip={handleClip}
-                processing={processing}
-              />
-            </div>
-
-            {/* Result */}
-            {downloadUrl && (
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-center">
-                <p className="text-green-800 font-medium mb-3">Clip Ready!</p>
-                <a 
-                  href={downloadUrl} 
-                  download 
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Clip
-                </a>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Features / Info Section (Optional Polish) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12">
+            {[
+                { title: 'MP4', desc: 'High quality video exports', icon: Video },
+                { title: 'MP3', desc: 'Direct MP3 conversion', icon: Music },
+                { title: 'No Account', desc: 'Fast, free, and no registration', icon: Zap }
+            ].map((feature, i) => (
+                <div key={i} className="text-center p-8 rounded-3xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-white rounded-2xl shadow-sm mb-6 text-[#5875F5]">
+                        <feature.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
+                    <p className="text-gray-500 font-medium">{feature.desc}</p>
+                </div>
+            ))}
+        </div>
       </div>
     </main>
   );

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { videoId, startTime, endTime } = body;
+    const { videoId, startTime, endTime, format, quality, title } = body;
 
     // 1. Validate Input
     if (!videoId || typeof startTime !== 'number' || typeof endTime !== 'number') {
@@ -27,28 +27,39 @@ export async function POST(req: NextRequest) {
         videoId,
         startTime,
         endTime,
+        format: format || 'mp4',
+        quality: quality || null,
+        title: title || 'Untitled Clip',
         status: 'PENDING',
         originalUrl: `https://youtube.com/watch?v=${videoId}`
       }
     });
 
-    // Add to BullMQ
+    // Add to BullMQ with jobId matching clipId for easy tracking
     await clipQueue.add('process-clip', {
       videoId,
       startTime,
       endTime,
-      clipId: clip.id
+      format: format || 'mp4',
+      quality: quality || null,
+      clipId: clip.id,
+      title: title || 'Untitled Clip'
+    }, { 
+      jobId: clip.id,
+      removeOnComplete: true,
+      removeOnFail: false
     });
+
+    console.log(`[API] Successfully added clip job ${clip.id} to queue`);
 
     return NextResponse.json({
       status: 'queued',
       clipId: clip.id,
-      jobId: (await clipQueue.getJob(clip.id))?.id, // best effort to get job ID if needed immediately
       message: 'Processing started'
     });
 
   } catch (error: any) {
-    console.error('Clip API Error:', error);
+    console.error('*** CLIP API ERROR ***', error);
     return NextResponse.json(
       { error: 'Failed to process clip', details: error.message },
       { status: 500 }

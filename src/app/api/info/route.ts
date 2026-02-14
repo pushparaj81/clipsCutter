@@ -11,19 +11,23 @@ export async function POST(req: NextRequest) {
 
     const metadata = await getVideoMetadata(url);
 
+    const videoId = metadata.id || metadata.display_id || new URL(url).searchParams.get('v') || url.split('/').pop()?.split('?')[0];
+    
+    console.log(`Extracted Video ID: ${videoId}, Title: ${metadata.title}`);
+
     // Extract relevant fields standard for the frontend
     const info = {
-      videoId: metadata.id || metadata.display_id,
-      title: metadata.title,
+      videoId,
+      title: metadata.title || 'Untitled Video',
       thumbnail: metadata.thumbnail || (metadata.thumbnails && metadata.thumbnails.length > 0 ? metadata.thumbnails[metadata.thumbnails.length - 1].url : null),
-      duration: metadata.duration,
-      formats: metadata.formats ? metadata.formats.map((f: any) => ({
-        format_id: f.format_id,
-        ext: f.ext,
-        resolution: f.resolution,
-        filesize: f.filesize
-      })) : []
+      duration: Number(metadata.duration) || 0,
+      availableQualities: metadata.availableQualities,
+      availableFormats: metadata.availableFormats
     };
+
+    if (!info.videoId) {
+      throw new Error('Could not determine video ID');
+    }
 
     return NextResponse.json(info);
   } catch (error: any) {

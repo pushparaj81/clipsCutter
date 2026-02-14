@@ -1,7 +1,11 @@
 import 'dotenv/config';
 import { clipWorker } from './lib/worker';
+import { startCleanupJob } from './lib/cleanup';
 
 console.log('Worker started...');
+
+// Start background cleanup
+startCleanupJob();
 
 clipWorker.on('completed', (job) => {
   console.log(`Job ${job.id} completed!`);

@@ -1,0 +1,240 @@
+
+
+--- [2026-02-13T16:36:49.788Z] Starting Download ---
+Command: C:/ffmpeg/bin/yt-dlp.exe https://www.youtube.com/watch?v=nMUmySghIL0 --download-sections *64-118 --output public\temp\nMUmySghIL0_64_118_2160.mp4 --newline --progress --ffmpeg-location C:/ffmpeg/bin/ffmpeg.exe --format bestvideo[height<=2160][ext=mp4]+bestaudio[ext=m4a]/best[height<=2160][ext=mp4]/best
+STDOUT: [youtube] Extracting URL: https://www.youtube.com/watch?v=nMUmySghIL0
+STDOUT: [youtube] nMUmySghIL0: Downloading webpage
+STDERR: WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+STDOUT: [youtube] nMUmySghIL0: Downloading android vr player API JSON
+STDOUT: [info] nMUmySghIL0: Downloading 1 format(s): 401+140
+[info] nMUmySghIL0: Downloading 1 time ranges: 64.0-118.0
+STDOUT: [download] Destination: public\temp\nMUmySghIL0_64_118_2160.mp4
+STDERR: Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr5---sn-gwpa-nm8e.googlevideo.com/videoplayback?expire=1771022213&ei=JVOPadKfMbfNssUPia6ZkAg&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-ADTGC33S3_Bhlb_S9_oly8x84qJCk2_1ggEQsnV8bPlg&itag=401&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1169&met=1771000613%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-nm8e%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=5&pl=45&rms=au%2Cau&initcwndbps=680000&bui=AW-iu_qYSq8c1hXUP0RobJAlVkYWkRCITyK9MkGcLCaEA57ktrHTqjixe0jME8dYKodKOIzUCcTsf0GX&spc=q5xjPMD3t9tZ&vprv=1&svpuc=1&mime=video%2Fmp4&rqh=1&gir=yes&clen=176396821&dur=296.999&lmt=1767665392204650&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5532534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRAIgO8IALD4GSofgI76Qrs6HEgQNLyUCdAAhQdijXHWPONcCIDgE-KFKfPftuDlapg8dI3D7BEaEkqCDkTQg4EO-z_C3&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgd0JJY2F-MCNcEnEgLccFpqmhBpgQqTbHdi8H8pDQnWUCIEw__QYPe25T1LJ9tAihdKVx9UKflcMh9qkw6QcYdtMz':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    creation_time   : 2026-01-06T01:35:51.000000Z
+  Duration: 00:04:57.00, start: 0.000000, bitrate: 4751 kb/s
+STDERR:   Stream #0:0[0x1](und): Video: av1 (libaom-av1) (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 3840x2160 [SAR 1:1 DAR 16:9], 13112 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:51.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr5---sn-gwpa-nm8e.googlevideo.com/videoplayback?expire=1771022213&ei=JVOPadKfMbfNssUPia6ZkAg&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-ADTGC33S3_Bhlb_S9_oly8x84qJCk2_1ggEQsnV8bPlg&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1169&met=1771000613%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-nm8e%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=5&pl=45&rms=au%2Cau&initcwndbps=680000&bui=AW-iu_qYSq8c1hXUP0RobJAlVkYWkRCITyK9MkGcLCaEA57ktrHTqjixe0jME8dYKodKOIzUCcTsf0GX&spc=q5xjPMD3t9tZ&vprv=1&svpuc=1&mime=audio%2Fmp4&rqh=1&gir=yes&clen=4808492&dur=297.052&lmt=1767663022304945&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5532534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRQIgSMMZL2krlJoyOkv-shhXql_m_nM93kLOhKvr8tqO6NcCIQDrqcXv01rrNsJwZ0fjuR_dVUJmjvQWWm9ej3hM3TDDAw%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgd0JJY2F-MCNcEnEgLccFpqmhBpgQqTbHdi8H8pDQnWUCIEw__QYPe25T1LJ9tAihdKVx9UKflcMh9qkw6QcYdtMz':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2026-01-06T01:30:15.000000Z
+    encoder         : Google
+STDERR:   Duration: 00:04:57.05, start: 0.000000, bitrate: 129 kb/s
+  Stream #1:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #1:0 -> #0:1 (copy)
+Output #0, mp4, to 'file:public\temp\nMUmySghIL0_64_118_2160.mp4.part':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    encoder         : Lavf62.3.100
+  Stream #0:0(und): Video: av1 (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 13112 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:51.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Press [q] to stop, [?] for help
+STDERR: frame=    0 fps=0.0 q=-1.0 size=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.51    STDERR: frame=    9 fps=8.8 q=-1.0 size=     256KiB time=-00:00:00.25 bitrate=N/A speed=N/A elapsed=0:00:01.02    STDERR: frame=   48 fps= 31 q=-1.0 size=    1024KiB time=00:00:01.37 bitrate=6101.1kbits/s speed=0.889x elapsed=0:00:01.54    STDERR: frame=   73 fps= 35 q=-1.0 size=    1536KiB time=00:00:02.41 bitrate=5206.9kbits/s speed=1.17x elapsed=0:00:02.06    STDERR: frame=   92 fps= 36 q=-1.0 size=    2048KiB time=00:00:03.20 bitrate=5229.4kbits/s speed=1.24x elapsed=0:00:02.57    STDERR: frame=  100 fps= 32 q=-1.0 size=    2560KiB time=00:00:03.54 bitrate=5921.5kbits/s speed=1.15x elapsed=0:00:03.08    STDERR: frame=  108 fps= 30 q=-1.0 size=    2816KiB time=00:00:03.87 bitrate=5953.3kbits/s speed=1.08x elapsed=0:00:03.60    STDERR: frame=  120 fps= 29 q=-1.0 size=    3584KiB time=00:00:04.37 bitrate=6711.0kbits/s speed=1.06x elapsed=0:00:04.12    STDERR: frame=  129 fps= 28 q=-1.0 size=    4096KiB time=00:00:04.75 bitrate=7064.2kbits/s speed=1.02x elapsed=0:00:04.64    STDERR: frame=  160 fps= 31 q=-1.0 size=    4608KiB time=00:00:06.04 bitrate=6248.1kbits/s speed=1.17x elapsed=0:00:05.15    STDERR: frame=  191 fps= 34 q=-1.0 size=    5120KiB time=00:00:07.33 bitrate=5719.6kbits/s speed=1.29x elapsed=0:00:05.66    STDERR: frame=  234 fps= 38 q=-1.0 size=    5888KiB time=00:00:09.12 bitrate=5286.0kbits/s speed=1.48x elapsed=0:00:06.18    STDERR: frame=  249 fps= 37 q=-1.0 size=    6400KiB time=00:00:09.75 bitrate=5377.4kbits/s speed=1.46x elapsed=0:00:06.69    STDERR: frame=  283 fps= 39 q=-1.0 size=    6912KiB time=00:00:11.16 bitrate=5070.8kbits/s speed=1.55x elapsed=0:00:07.21    STDERR: frame=  322 fps= 42 q=-1.0 size=    7680KiB time=00:00:12.79 bitrate=4918.4kbits/s speed=1.65x elapsed=0:00:07.74    STDERR: frame=  354 fps= 43 q=-1.0 size=    8192KiB time=00:00:14.12 bitrate=4751.1kbits/s speed=1.71x elapsed=0:00:08.25    STDERR: frame=  388 fps= 44 q=-1.0 size=    8448KiB time=00:00:15.54 bitrate=4453.0kbits/s speed=1.77x elapsed=0:00:08.76    STDERR: frame=  408 fps= 44 q=-1.0 size=    8960KiB time=00:00:16.37 bitrate=4482.5kbits/s speed=1.76x elapsed=0:00:09.28    STDERR: frame=  423 fps= 43 q=-1.0 size=    9216KiB time=00:00:17.00 bitrate=4441.1kbits/s speed=1.73x elapsed=0:00:09.80    STDERR: frame=  503 fps= 49 q=-1.0 size=    9984KiB time=00:00:20.33 bitrate=4022.4kbits/s speed=1.97x elapsed=0:00:10.31    STDERR: frame=  542 fps= 50 q=-1.0 size=   10752KiB time=00:00:21.95 bitrate=4011.3kbits/s speed=2.03x elapsed=0:00:10.82    STDERR: frame=  572 fps= 50 q=-1.0 size=   11520KiB time=00:00:23.20 bitrate=4066.3kbits/s speed=2.05x elapsed=0:00:11.34    STDERR: frame=  612 fps= 52 q=-1.0 size=   12032KiB time=00:00:24.87 bitrate=3962.5kbits/s speed= 2.1x elapsed=0:00:11.85    STDERR: frame=  625 fps= 51 q=-1.0 size=   12288KiB time=00:00:25.41 bitrate=3960.5kbits/s speed=2.06x elapsed=0:00:12.36    STDERR: frame=  659 fps= 51 q=-1.0 size=   12800KiB time=00:00:26.83 bitrate=3907.8kbits/s speed=2.08x elapsed=0:00:12.89    STDERR: frame=  691 fps= 52 q=-1.0 size=   13568KiB time=00:00:28.16 bitrate=3946.1kbits/s speed= 2.1x elapsed=0:00:13.40    STDERR: frame=  723 fps= 52 q=-1.0 size=   14080KiB time=00:00:29.50 bitrate=3910.0kbits/s speed=2.12x elapsed=0:00:13.92    STDERR: frame=  762 fps= 53 q=-1.0 size=   14848KiB time=00:00:31.12 bitrate=3908.0kbits/s speed=2.16x elapsed=0:00:14.43    STDERR: frame=  793 fps= 53 q=-1.0 size=   15360KiB time=00:00:32.41 bitrate=3881.6kbits/s speed=2.17x elapsed=0:00:14.95    STDERR: frame=  828 fps= 54 q=-1.0 size=   15872KiB time=00:00:33.87 bitrate=3838.3kbits/s speed=2.19x elapsed=0:00:15.46    STDERR: frame=  865 fps= 54 q=-1.0 size=   16640KiB time=00:00:35.41 bitrate=3848.9kbits/s speed=2.21x elapsed=0:00:15.99    STDERR: frame=  901 fps= 55 q=-1.0 size=   17152KiB time=00:00:36.91 bitrate=3806.1kbits/s speed=2.24x elapsed=0:00:16.49    STDERR: frame=  924 fps= 54 q=-1.0 size=   17664KiB time=00:00:37.87 bitrate=3820.6kbits/s speed=2.23x elapsed=0:00:17.01    STDERR: frame=  924 fps= 53 q=-1.0 size=   17664KiB time=00:00:37.87 bitrate=3820.6kbits/s speed=2.16x elapsed=0:00:17.53    STDERR: frame=  933 fps= 52 q=-1.0 size=   18688KiB time=00:00:38.25 bitrate=4002.4kbits/s speed=2.12x elapsed=0:00:18.05    STDERR: frame=  945 fps= 51 q=-1.0 size=   19200KiB time=00:00:38.75 bitrate=4059.0kbits/s speed=2.09x elapsed=0:00:18.56    STDERR: frame=  957 fps= 50 q=-1.0 size=   19456KiB time=00:00:39.25 bitrate=4060.7kbits/s speed=2.06x elapsed=0:00:19.07    STDERR: frame=  973 fps= 50 q=-1.0 size=   20480KiB time=00:00:39.91 bitrate=4203.1kbits/s speed=2.04x elapsed=0:00:19.59    STDERR: frame=  978 fps= 49 q=-1.0 size=   20736KiB time=00:00:40.12 bitrate=4233.5kbits/s speed=   2x elapsed=0:00:20.10    STDERR: frame=  979 fps= 47 q=-1.0 size=   20992KiB time=00:00:40.16 bitrate=4281.3kbits/s speed=1.95x elapsed=0:00:20.62    STDERR: frame=  979 fps= 46 q=-1.0 size=   20992KiB time=00:00:40.16 bitrate=4281.3kbits/s speed= 1.9x elapsed=0:00:21.14    STDERR: frame=  989 fps= 46 q=-1.0 size=   22016KiB time=00:00:40.58 bitrate=4444.1kbits/s speed=1.87x elapsed=0:00:21.65    STDERR: frame=  993 fps= 45 q=-1.0 size=   22016KiB time=00:00:40.75 bitrate=4425.9kbits/s speed=1.84x elapsed=0:00:22.16    STDERR: frame= 1000 fps= 44 q=-1.0 size=   22784KiB time=00:00:41.04 bitrate=4547.7kbits/s speed=1.81x elapsed=0:00:22.68    STDERR: frame= 1007 fps= 43 q=-1.0 size=   23040KiB time=00:00:41.33 bitrate=4566.4kbits/s speed=1.78x elapsed=0:00:23.20    STDERR: frame= 1011 fps= 43 q=-1.0 size=   23808KiB time=00:00:41.50 bitrate=4699.7kbits/s speed=1.75x elapsed=0:00:23.71    STDERR: frame= 1023 fps= 42 q=-1.0 size=   24320KiB time=00:00:42.00 bitrate=4743.6kbits/s speed=1.73x elapsed=0:00:24.23    STDERR: frame= 1023 fps= 41 q=-1.0 size=   24320KiB time=00:00:42.00 bitrate=4743.6kbits/s speed= 1.7x elapsed=0:00:24.75    STDERR: frame= 1035 fps= 41 q=-1.0 size=   25344KiB time=00:00:42.50 bitrate=4885.1kbits/s speed=1.68x elapsed=0:00:25.25    STDERR: frame= 1043 fps= 40 q=-1.0 size=   25856KiB time=00:00:42.83 bitrate=4945.0kbits/s speed=1.66x elapsed=0:00:25.77    STDERR: frame= 1070 fps= 41 q=-1.0 size=   26624KiB time=00:00:43.95 bitrate=4961.6kbits/s speed=1.67x elapsed=0:00:26.29    STDERR: frame= 1099 fps= 41 q=-1.0 size=   27136KiB time=00:00:45.16 bitrate=4921.7kbits/s speed=1.68x elapsed=0:00:26.81    STDERR: frame= 1100 fps= 40 q=-1.0 size=   27392KiB time=00:00:45.20 bitrate=4963.6kbits/s speed=1.65x elapsed=0:00:27.32    STDERR: frame= 1108 fps= 40 q=-1.0 size=   27648KiB time=00:00:45.54 bitrate=4973.3kbits/s speed=1.64x elapsed=0:00:27.84    STDERR: frame= 1124 fps= 40 q=-1.0 size=   28160KiB time=00:00:46.20 bitrate=4992.3kbits/s speed=1.63x elapsed=0:00:28.35    STDERR: frame= 1132 fps= 39 q=-1.0 size=   28416KiB time=00:00:46.54 bitrate=5001.6kbits/s speed=1.61x elapsed=0:00:28.87    STDERR: frame= 1146 fps= 39 q=-1.0 size=   28928KiB time=00:00:47.12 bitrate=5028.7kbits/s speed= 1.6x elapsed=0:00:29.39    STDERR: frame= 1168 fps= 39 q=-1.0 size=   29440KiB time=00:00:48.04 bitrate=5020.1kbits/s speed=1.61x elapsed=0:00:29.92    STDERR: frame= 1185 fps= 39 q=-1.0 size=   29952KiB time=00:00:48.75 bitrate=5033.2kbits/s speed= 1.6x elapsed=0:00:30.43    STDERR: frame= 1225 fps= 40 q=-1.0 size=   30720KiB time=00:00:50.41 bitrate=4991.6kbits/s speed=1.63x elapsed=0:00:30.94    STDERR: frame= 1260 fps= 40 q=-1.0 size=   31488KiB time=00:00:51.87 bitrate=4972.5kbits/s speed=1.65x elapsed=0:00:31.46    STDERR: frame= 1290 fps= 40 q=-1.0 size=   32000KiB time=00:00:53.12 bitrate=4934.5kbits/s speed=1.66x elapsed=0:00:31.97    STDERR: [out#0/mp4 @ 00000260a5b4f940] video:31614KiB audio:844KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.091183%
+frame= 1311 fps= 41 q=-1.0 Lsize=   32487KiB time=00:00:54.00 bitrate=4928.4kbits/s speed=1.68x elapsed=0:00:32.17    
+STDOUT: [download] 100% of   31.73MiB in 00:00:35 at 925.50KiB/s
+Closed with code: 0
+
+
+--- [2026-02-13T16:41:32.253Z] Starting Download ---
+Command: C:/ffmpeg/bin/yt-dlp.exe https://www.youtube.com/watch?v=nMUmySghIL0 --download-sections *151-174 --output public\temp\nMUmySghIL0_151_174_144.mp4 --newline --progress --ffmpeg-location C:/ffmpeg/bin/ffmpeg.exe --format bestvideo[height<=144][ext=mp4]+bestaudio[ext=m4a]/best[height<=144][ext=mp4]/best
+STDOUT: [youtube] Extracting URL: https://www.youtube.com/watch?v=nMUmySghIL0
+STDOUT: [youtube] nMUmySghIL0: Downloading webpage
+STDERR: WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+STDOUT: [youtube] nMUmySghIL0: Downloading android vr player API JSON
+STDOUT: [info] nMUmySghIL0: Downloading 1 format(s): 394+140
+[info] nMUmySghIL0: Downloading 1 time ranges: 151.0-174.0
+STDOUT: [download] Destination: public\temp\nMUmySghIL0_151_174_144.mp4
+STDERR: Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr1---sn-gwpa-pmhz.googlevideo.com/videoplayback?expire=1771022496&ei=QFSPaaSJFPSV4t4PsPCK8QU&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AA4jMBQkCpXarzXmcjnd2_TJp0SIqkhBCr-gSDDd8ccL&itag=394&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1131&met=1771000896%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-pmhz%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=1&pl=45&rms=au%2Cau&initcwndbps=647500&bui=AW-iu_rNAxhOmibyPcJq8qouMaOp0JEfvZy1AZtL314Al0Er0YvDv4a8cc7FaQ_vgBEyvwN5jnBD1oIV&spc=q5xjPMP1wFsB&vprv=1&svpuc=1&mime=video%2Fmp4&rqh=1&gir=yes&clen=1840823&dur=296.999&lmt=1767665529120685&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5537534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRQIgAciZ5lPFnlojYIfTfRt4ioWEP0ZTZhWNgfmNNvnmtYkCIQDW7VnzSSjRKy0fF7tLY85FI1kaalZTvKmwrHQu6ZIfTg%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgDtGjZcHQkaz0r5l3_gCMCB6Gnf_ery1DRWu1z9sh14oCIGHWiynBeqU5ur5OR_fJ0S-uUxANbaKYCogFBkRlRD5q':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    creation_time   : 2026-01-06T01:35:12.000000Z
+STDERR:   Duration: 00:04:57.00, start: 0.000000, bitrate: 49 kb/s
+  Stream #0:0[0x1](und): Video: av1 (libaom-av1) (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr1---sn-gwpa-pmhz.googlevideo.com/videoplayback?expire=1771022496&ei=QFSPaaSJFPSV4t4PsPCK8QU&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AA4jMBQkCpXarzXmcjnd2_TJp0SIqkhBCr-gSDDd8ccL&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1131&met=1771000896%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-pmhz%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=1&pl=45&rms=au%2Cau&initcwndbps=647500&bui=AW-iu_rNAxhOmibyPcJq8qouMaOp0JEfvZy1AZtL314Al0Er0YvDv4a8cc7FaQ_vgBEyvwN5jnBD1oIV&spc=q5xjPMP1wFsB&vprv=1&svpuc=1&mime=audio%2Fmp4&rqh=1&gir=yes&clen=4808492&dur=297.052&lmt=1767663022304945&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5532534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRgIhAK_1hxDHa6QraDPvlEHf10lovi-uStFSq6D6UQ1FaJNuAiEAnSOMIDW5bTrTSveGinv6s4UihwM_HUhrYWtxmrv3dDs%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgDtGjZcHQkaz0r5l3_gCMCB6Gnf_ery1DRWu1z9sh14oCIGHWiynBeqU5ur5OR_fJ0S-uUxANbaKYCogFBkRlRD5q':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2026-01-06T01:30:15.000000STDERR: Z
+    encoder         : Google
+  Duration: 00:04:57.05, start: 0.000000, bitrate: 129 kb/s
+  Stream #1:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #1:0 -> #0:1 (copy)
+Output #0, mp4, to 'file:public\temp\nMUmySghIL0_151_174_144.mp4.part':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    encoder         : Lavf62.3.100
+  Stream #0:0(und): Video: av1 (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], q=2-31, 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Press [q] to stop, [?] for help
+STDERR: [out#0/mp4 @ 000001c3ab4680c0] video:144KiB audio:360KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 2.674468%
+frame=  571 fps=0.0 q=-1.0 Lsize=     517KiB time=00:00:23.00 bitrate= 184.0kbits/s speed=88.4x elapsed=0:00:00.26    
+STDOUT: [download] 100% of  516.66KiB in 00:00:01 at 424.87KiB/s
+Closed with code: 0
+
+
+--- [2026-02-13T16:41:58.232Z] Starting Download ---
+Command: C:/ffmpeg/bin/yt-dlp.exe https://www.youtube.com/watch?v=nMUmySghIL0 --download-sections *177-192 --output public\temp\nMUmySghIL0_177_192_144.mp4 --newline --progress --ffmpeg-location C:/ffmpeg/bin/ffmpeg.exe --format bestvideo[height<=144][ext=mp4]+bestaudio[ext=m4a]/best[height<=144][ext=mp4]/best
+STDOUT: [youtube] Extracting URL: https://www.youtube.com/watch?v=nMUmySghIL0
+STDOUT: [youtube] nMUmySghIL0: Downloading webpage
+STDERR: WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+STDOUT: [youtube] nMUmySghIL0: Downloading android vr player API JSON
+STDOUT: [info] nMUmySghIL0: Downloading 1 format(s): 394+140
+STDOUT: [info] nMUmySghIL0: Downloading 1 time ranges: 177.0-192.0
+STDOUT: [download] Destination: public\temp\nMUmySghIL0_177_192_144.mp4
+STDERR: Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr1---sn-gwpa-pmhz.googlevideo.com/videoplayback?expire=1771022523&ei=WlSPacmvPKTH9fwP2o7zkAY&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AOexUmYqYmmkIQgXLM0xZu6hJeNNvf9CYbmosYlw_MPG&itag=394&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1131&met=1771000922%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-pmhz%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=1&pl=45&rms=au%2Cau&initcwndbps=647500&bui=AW-iu_oMHjaMfsBZsT8sNgb_FF0qWZbeIk9EFehhpm_l-lrjJX7UxfOY5CeYpu_YZsTouCActJWHTdLY&spc=q5xjPMn-fqBN&vprv=1&svpuc=1&mime=video%2Fmp4&rqh=1&gir=yes&clen=1840823&dur=296.999&lmt=1767665529120685&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5537534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRQIhAIwp9QrbB1hDqGTfrSFo8bkm4PoXkcQmYvQhvgKsHAuyAiBq4zIGnuudw43VInpCNMPAbAIQ_alIosBhkP4vh4ED1Q%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRQIgSc5XJgqzGoIVDQJCUls9nQZXOtwvHNYKzjTKeVbIVDQCIQDn2kv9Igi9wVVTynv4LEZHg5Ylq2zQWQzij6BrkFOSGA%3D%3D':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    creation_time   : 2026-01-06T01:35:12.000000Z
+  Duration: 00:04:57.00, start: 0.000000, bitrate: 49 kb/s
+STDERR:   Stream #0:0[0x1](und): Video: av1 (libaom-av1) (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr1---sn-gwpa-pmhz.googlevideo.com/videoplayback?expire=1771022523&ei=WlSPacmvPKTH9fwP2o7zkAY&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AOexUmYqYmmkIQgXLM0xZu6hJeNNvf9CYbmosYlw_MPG&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1131&met=1771000922%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-pmhz%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=1&pl=45&rms=au%2Cau&initcwndbps=647500&bui=AW-iu_oMHjaMfsBZsT8sNgb_FF0qWZbeIk9EFehhpm_l-lrjJX7UxfOY5CeYpu_YZsTouCActJWHTdLY&spc=q5xjPMn-fqBN&vprv=1&svpuc=1&mime=audio%2Fmp4&rqh=1&gir=yes&clen=4808492&dur=297.052&lmt=1767663022304945&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565115%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5532534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRgIhALt8F_vsSylYns1-EurygsxbPWvTiAB7pwWn1q6afreqAiEAln0FUkzqs188-6K1nJ-FtwPj5EwxzqQ7tbWc77mAAN4%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRQIgSc5XJgqzGoIVDQJCUls9nQZXOtwvHNYKzjTKeVbIVDQCIQDn2kv9Igi9wVVTynv4LEZHg5Ylq2zQWQzij6BrkFOSGA%3D%3D':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2026-01-06T01:30:15.000000Z
+    encoder         : Google
+  Duration: 00:04:57.05, start: 0.000000, bitrate: STDERR: 129 kb/s
+  Stream #1:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #1:0 -> #0:1 (copy)
+Output #0, mp4, to 'file:public\temp\nMUmySghIL0_177_192_144.mp4.part':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    encoder         : Lavf62.3.100
+  Stream #0:0(und): Video: av1 (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], q=2-31, 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Press [q] to stop, [?] for help
+STDERR: [out#0/mp4 @ 000002ad12546e00] video:112KiB audio:235KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 2.690675%
+STDERR: frame=  396 fps=0.0 q=-1.0 Lsize=     356KiB time=00:00:15.00 bitrate= 194.6kbits/s speed=35.5x elapsed=0:00:00.42    
+STDOUT: [download] 100% of  356.27KiB in 00:00:01 at 249.33KiB/s
+Closed with code: 0
+
+
+--- [2026-02-13T16:46:14.897Z] Starting Download ---
+Command: C:/ffmpeg/bin/yt-dlp.exe https://www.youtube.com/watch?v=nMUmySghIL0 --download-sections *135-186 --output public\temp\nMUmySghIL0_135_186_144.mp4 --newline --progress --ffmpeg-location C:/ffmpeg/bin/ffmpeg.exe --format bestvideo[height<=144][ext=mp4]+bestaudio[ext=m4a]/best[height<=144][ext=mp4]/best
+STDOUT: [youtube] Extracting URL: https://www.youtube.com/watch?v=nMUmySghIL0
+STDOUT: [youtube] nMUmySghIL0: Downloading webpage
+STDERR: WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+STDOUT: [youtube] nMUmySghIL0: Downloading android vr player API JSON
+STDOUT: [info] nMUmySghIL0: Downloading 1 format(s): 394+140
+[info] nMUmySghIL0: Downloading 1 time ranges: 135.0-186.0
+STDOUT: [download] Destination: public\temp\nMUmySghIL0_135_186_144.mp4
+STDERR: Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr5---sn-gwpa-nm8e.googlevideo.com/videoplayback?expire=1771022778&ei=WlWPafiPMOWt9fwP4YGp0Qc&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AJXVxRdmE_U1gZaq-WDVpHJ0FG9J45BQWDUz5x99EQXb&itag=394&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1107&met=1771001178%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-nm8e%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=5&pl=45&rms=au%2Cau&initcwndbps=680000&bui=AW-iu_oGahgpQz_d4qABScO6KEYo0iySnZ7-M4yGjDC-XHQcnoTDx-fZ7tmR46uYBUbEJZ9BLxOsS_QS&spc=q5xjPIblS3DN&vprv=1&svpuc=1&mime=video%2Fmp4&rqh=1&gir=yes&clen=1840823&dur=296.999&lmt=1767665529120685&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565116%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5537534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRQIhAM3Ym6VMKKozuFi_KDfqrUaAAsIX-LacI-RAr8cT80iEAiArhadmrpfEjKdrok-TL64ODgyy97dm2O_ZkCdL5guAWw%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgW9Z0BubJ7TBuCNiHdKe5uRxUAjLpaKp5hdrc58NNsV0CICwthtTuKf1DGTOEd65iSSRx3_mzDeythPBxuno50Bre':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41STDERR: 
+    creation_time   : 2026-01-06T01:35:12.000000Z
+  Duration: 00:04:57.00, start: 0.000000, bitrate: 49 kb/s
+  Stream #0:0[0x1](und): Video: av1 (libaom-av1) (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+STDERR: Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'https://rr5---sn-gwpa-nm8e.googlevideo.com/videoplayback?expire=1771022778&ei=WlWPafiPMOWt9fwP4YGp0Qc&ip=2409%3A40f4%3A38%3A80fe%3Ac176%3Ad3f2%3A4b31%3Ab814&id=o-AJXVxRdmE_U1gZaq-WDVpHJ0FG9J45BQWDUz5x99EQXb&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=1107&met=1771001178%2C&mh=Wb&mm=31%2C29&mn=sn-gwpa-nm8e%2Csn-gwpa-h55y&ms=au%2Crdu&mv=m&mvi=5&pl=45&rms=au%2Cau&initcwndbps=680000&bui=AW-iu_oGahgpQz_d4qABScO6KEYo0iySnZ7-M4yGjDC-XHQcnoTDx-fZ7tmR46uYBUbEJZ9BLxOsS_QS&spc=q5xjPIblS3DN&vprv=1&svpuc=1&mime=audio%2Fmp4&rqh=1&gir=yes&clen=4808492&dur=297.052&lmt=1767663022304945&mt=1771000170&fvip=2&keepalive=yes&fexp=51552689%2C51565116%2C51565682%2C51580968%2C51772949&c=ANDROID_VR&txp=5532534&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJEij0EwRQIgFsHl5sNkSRgLoaqvEndCghDjJRJxNvJ7AelC7imw_joCIQCPPsnAhWxqR_bfXo86KL9KtFBd1zQb3ijOhC4CgANgeA%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgW9Z0BubJ7TBuCNiHdKe5uRxUAjLpaKp5hdrc58NNsV0CICwthtTuKf1DGTOEd65iSSRx3_mzDeythPBxuno50Bre':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2026-01-06T01:30:15.000000Z
+    encoder         : Google
+  Duration: 00:04:57.05STDERR: , start: 0.000000, bitrate: 129 kb/s
+  Stream #1:0[0x1](eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #1:0 -> #0:1 (copy)
+Output #0, mp4, to 'file:public\temp\nMUmySghIL0_135_186_144.mp4.part':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6av01mp41
+    encoder         : Lavf62.3.100
+  Stream #0:0(und): Video: av1 (Main) (av01 / 0x31307661), yuv420p(tv, bt709), 256x144 [SAR 1:1 DAR 16:9], q=2-31, 52 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:35:12.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      creation_time   : 2026-01-06T01:30:15.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Press [q] to stop, [?] for help
+STDERR: frame=  313 fps=0.0 q=-1.0 size=       0KiB time=00:00:11.12 bitrate=   0.0kbits/s speed=21.5x elapsed=0:00:00.51    STDERR: frame= 1066 fps=1030 q=-1.0 size=     768KiB time=00:00:42.51 bitrate= 148.0kbits/s speed=41.1x elapsed=0:00:01.03    STDERR: STDERR: [out#0/mp4 @ 000001e1a4dc71c0] video:319KiB audio:797KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 2.515078%
+STDERR: frame= 1267 fps=1064 q=-1.0 Lsize=    1144KiB time=00:00:51.00 bitrate= 183.8kbits/s speed=42.8x elapsed=0:00:01.19    
+STDOUT: [download] 100% of    1.12MiB in 00:00:02 at 527.16KiB/s
+Closed with code: 0

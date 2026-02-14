@@ -2,7 +2,8 @@
  * Global Database Connection Pool Manager
  * 
  * This module ensures we use a single Prisma instance across the entire application
- * and properly manage connections to prevent pool exhaustion.
+ * and * properly manage connections to prevent pool exhaustion.
+ * Updated: Schema fixed.
  */
 
 import { Pool } from 'pg'

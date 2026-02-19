@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, AlertCircle, Loader2, Scissors, Video, Music, X, Trash2 } from 'lucide-react';
+import { Download, AlertCircle, Loader2, Scissors, Video, Music, X, Trash2, ChevronDown } from 'lucide-react';
 import { VideoPreview } from '@/components/VideoPreview';
 import { WaveformTrim } from '@/components/WaveformTrim';
 
@@ -60,6 +60,64 @@ const getRelativeTime = (dateString: string) => {
   if (diffInHours < 24) return `${diffInHours} hrs ago`;
   const diffInDays = Math.floor(diffInHours / 24);
   return `${diffInDays} days ago`;
+};
+
+const QualitySelect = ({ 
+  options, 
+  value, 
+  onChange 
+}: { 
+  options: { label: string, value: string }[], 
+  value: string, 
+  onChange: (val: string) => void 
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedLabel = options.find(o => o.value === String(value))?.label || value;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold shadow-sm hover:border-blue-500 transition-colors min-w-[100px] justify-between"
+      >
+        <span>{selectedLabel}</span>
+        <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      
+      {isOpen && (
+        <div className="absolute top-full mt-2 left-0 w-full min-w-[140px] bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="max-h-[300px] overflow-y-auto">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-gray-50 flex items-center justify-between ${
+                  String(value) === String(opt.value) ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'
+                }`}
+              >
+                {opt.label}
+                {String(value) === String(opt.value) && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 interface VideoEditorProps {
@@ -126,7 +184,13 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
 
       const mergedMap = new Map<string, Clip>();
       localClips.forEach(c => mergedMap.set(c.id, c));
-      serverClips.forEach(c => mergedMap.set(c.id, c));
+      
+      // Update local clips with server status, but DO NOT add new clips from server
+      serverClips.forEach(c => {
+          if (mergedMap.has(c.id)) {
+              mergedMap.set(c.id, { ...mergedMap.get(c.id)!, ...c });
+          }
+      });
       
       const mergedList = Array.from(mergedMap.values()).sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -164,9 +228,9 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           setStartTime(0);
           setEndTime(cached.duration || 0);
           if (cached.availableQualities?.length > 0) {
-            const defaultQuality = cached.availableQualities.find((q: { height: number }) => q.height === 480) 
-              ? '480' 
-              : String(cached.availableQualities[0].height);
+            const defaultQuality = cached.availableQualities.find((q: { height: number }) => q.height === 720) 
+              ? '720' 
+              : (cached.availableQualities.find((q: { height: number }) => q.height === 480) ? '480' : String(cached.availableQualities[0].height));
             setQuality(defaultQuality);
           }
         } catch (e) {
@@ -191,9 +255,9 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           setStartTime(0);
           setEndTime(data.duration || 0);
           if (data.availableQualities?.length > 0) {
-            const defaultQuality = data.availableQualities.find((q: { height: number }) => q.height === 480) 
-              ? '480' 
-              : String(data.availableQualities[0].height);
+            const defaultQuality = data.availableQualities.find((q: { height: number }) => q.height === 720) 
+              ? '720' 
+              : (data.availableQualities.find((q: { height: number }) => q.height === 480) ? '480' : String(data.availableQualities[0].height));
             setQuality(defaultQuality);
           }
         }
@@ -218,9 +282,9 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
         }
     } else if (videoInfo && videoInfo.availableQualities && videoInfo.availableQualities.length > 0) {
         if (quality === '128' || quality === '320') {
-            const defaultQuality = videoInfo.availableQualities.find((q: { height: number }) => q.height === 480) 
-                ? '480' 
-                : String(videoInfo.availableQualities[0].height);
+            const defaultQuality = videoInfo.availableQualities.find((q: { height: number }) => q.height === 720) 
+                ? '720' 
+                : (videoInfo.availableQualities.find((q: { height: number }) => q.height === 480) ? '480' : String(videoInfo.availableQualities[0].height));
             setQuality(defaultQuality);
         }
     }
@@ -342,12 +406,12 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     if (!videoId) return;
     try {
       setLoadingClips(true);
-      const res = await fetch(`/api/clips/video/${videoId}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setClips([]);
-        localStorage.removeItem(`clips_${videoId}`);
-      }
+      // Optimistically clear local state and storage
+      setClips([]);
+      localStorage.removeItem(`clips_${videoId}`);
+      
+      // Attempt to clear on server
+      await fetch(`/api/clips/video/${videoId}`, { method: 'DELETE' });
     } catch (err) {
       console.error('Error clearing clips:', err);
     } finally {
@@ -444,30 +508,27 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   {format === 'mp3' ? (
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
-                      <select
+                      <QualitySelect 
                         value={quality === '128' || quality === '320' ? quality : '128'}
-                        onChange={(e) => setQuality(e.target.value)}
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      >
-                        <option value="128">128k</option>
-                        <option value="320">320k</option>
-                      </select>
+                        onChange={(val) => setQuality(val)}
+                        options={[
+                          { label: '128 kbps', value: '128' },
+                          { label: '320 kbps', value: '320' }
+                        ]}
+                      />
                     </div>
                   ) : (
                     videoInfo.availableQualities?.length > 0 && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
-                        <select
+                        <QualitySelect 
                           value={quality}
-                          onChange={(e) => setQuality(e.target.value)}
-                          className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        >
-                          {videoInfo.availableQualities.map((q: { height: number; label: string }) => (
-                            <option key={q.height} value={q.height}>
-                              {q.label}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={(val) => setQuality(val)}
+                          options={videoInfo.availableQualities.map((q: { height: number; label: string }) => ({
+                            label: q.label,
+                            value: String(q.height)
+                          }))}
+                        />
                       </div>
                     )
                   )}

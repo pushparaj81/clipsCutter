@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     max_clip_duration: int = 600  # 10 minutes
     max_concurrent_workers: int = 5
     
+    # Timeouts (in seconds)
+    video_metadata_timeout: int = 120  # 2 minutes for metadata extraction
+    socket_timeout: int = 30  # socket timeout for network operations
+    
     # Optional binary paths
     yt_dlp_path: str | None = None
     ffmpeg_path: str | None = None

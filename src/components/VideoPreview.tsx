@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 
 interface VideoPreviewProps {
   videoId: string;
@@ -9,17 +9,56 @@ interface VideoPreviewProps {
   onTimeUpdate?: (time: number) => void;
 }
 
+export interface VideoPlayerHandle {
+  play: () => void;
+  pause: () => void;
+}
+
+interface YouTubePlayer {
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
+  playVideo: () => void;
+  pauseVideo: () => void;
+  getCurrentTime: () => number;
+  getPlayerState: () => number;
+  destroy: () => void;
+}
+
 declare global {
   interface Window {
     onYouTubeIframeAPIReady: () => void;
-    YT: any;
+    YT: {
+      Player: new (element: HTMLElement, options: Record<string, unknown>) => YouTubePlayer;
+    };
   }
 }
 
-export const VideoPreview = ({ videoId, seekTime, endTime, onTimeUpdate }: VideoPreviewProps) => {
-  const playerRef = useRef<any>(null);
+const VideoPreviewComponent = forwardRef<VideoPlayerHandle, VideoPreviewProps>(
+  ({ videoId, seekTime, endTime, onTimeUpdate }, ref) => {
+  const playerRef = useRef<YouTubePlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  
+  // Expose play/pause methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    play: () => {
+      if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
+        try {
+          playerRef.current.playVideo();
+        } catch {
+          // Ignore errors
+        }
+      }
+    },
+    pause: () => {
+      if (playerRef.current && typeof playerRef.current.pauseVideo === 'function') {
+        try {
+          playerRef.current.pauseVideo();
+        } catch {
+          // Ignore errors
+        }
+      }
+    }
+  }), []);
   
   // Use refs for dynamic props to avoid re-initializing player on every boundary change
   const endTimeRef = useRef(endTime);
@@ -117,9 +156,9 @@ export const VideoPreview = ({ videoId, seekTime, endTime, onTimeUpdate }: Video
         if (playerRef.current.seekTo) {
             playerRef.current.seekTo(seekTime, true);
         }
-        // Optional: auto-play when seeking to a new start point
-        if (playerRef.current.playVideo) {
-            playerRef.current.playVideo();
+        // Update UI display to show the new seek position
+        if (onTimeUpdateRef.current) {
+          onTimeUpdateRef.current(seekTime);
         }
       } catch {
         // Ignore errors during player transition
@@ -132,4 +171,7 @@ export const VideoPreview = ({ videoId, seekTime, endTime, onTimeUpdate }: Video
       <div ref={containerRef} className="absolute inset-0 w-full h-full" />
     </div>
   );
-};
+});
+
+VideoPreviewComponent.displayName = 'VideoPreview';
+export const VideoPreview = VideoPreviewComponent;

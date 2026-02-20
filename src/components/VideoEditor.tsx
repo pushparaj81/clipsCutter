@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, AlertCircle, Loader2, Scissors, Video, Music, X, Trash2, ChevronDown } from 'lucide-react';
-import { VideoPreview } from '@/components/VideoPreview';
+import { VideoPreview, VideoPlayerHandle } from '@/components/VideoPreview';
 import { WaveformTrim } from '@/components/WaveformTrim';
 
 interface VideoQualities {
@@ -142,8 +142,15 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
   const [loadingClips, setLoadingClips] = useState(false);
   
   const currentJobIdRef = useRef<string | null>(null);
+  const playerRef = useRef<VideoPlayerHandle>(null);
   const [storageStatus, setStorageStatus] = useState<string>('');
   const [completedClip, setCompletedClip] = useState<Clip | null>(null);
+  
+  // Modal for duration error
+  const [showDurationModal, setShowDurationModal] = useState(false);
+  const [durationLimitError, setDurationLimitError] = useState<{current: string, max: string} | null>(null);
+  
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Local Storage Helpers
   const getStoredClips = useCallback((vid: string): Clip[] => {
@@ -298,6 +305,28 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     setSeekTime(time);
   };
 
+  const handlePlay = () => {
+    if (playerRef.current) {
+      playerRef.current.play();
+    }
+  };
+
+  const handlePause = () => {
+    if (playerRef.current) {
+      playerRef.current.pause();
+    }
+  };
+
+  const handleCancelProcessing = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+    currentJobIdRef.current = null;
+    setProcessing(false);
+    fetchClips();
+  }, [fetchClips]);
+
   const handleClip = async () => {
     if (!videoInfo) return;
     setProcessing(true);
@@ -349,8 +378,8 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
       const updatedClips = [newClip, ...currentClips];
       saveClipsToStorage(videoInfo.videoId, updatedClips);
       setClips(updatedClips);
-
-      const pollInterval = setInterval(async () => {
+ 
+      pollIntervalRef.current = setInterval(async () => {
         try {
           const statusRes = await fetch(`/api/clips/${clipId}`);
           const statusData = await statusRes.json();
@@ -364,15 +393,20 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           }
 
           if (statusData.status === 'COMPLETED') {
-            clearInterval(pollInterval);
+            if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+            }
             fetchClips();
             if (currentJobIdRef.current === clipId) {
                 setCompletedClip({ ...statusData, id: clipId });
                 setProcessing(false);
-
             }
           } else if (statusData.status === 'FAILED') {
-            clearInterval(pollInterval);
+            if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+            }
             fetchClips();
             if (currentJobIdRef.current === clipId) {
                 setError(statusData.error || 'Clipping failed');
@@ -389,15 +423,24 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
         }
       }, 2000);
 
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('HandleClip Error:', err);
-      if (err instanceof Error) {
-          setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      
+      // Detect duration limit error
+      if (errorMessage.toLowerCase().includes('exceeds maximum')) {
+          const match = errorMessage.match(/\(([\d.]+s?)\).*?\(([\d.]+s?)\)/);
+          if (match) {
+              setDurationLimitError({ current: match[1], max: match[2] });
+          } else {
+              setDurationLimitError({ current: 'Too long', max: '1 hour' });
+          }
+          setShowDurationModal(true);
       } else {
-          setError('Clipping failed');
+          setError(errorMessage);
       }
+      
       setProcessing(false);
-
       fetchClips();
     }
   };
@@ -471,6 +514,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           {activeTab === 'edit' ? (
             <div className="space-y-6">
               <VideoPreview 
+                ref={playerRef}
                 videoId={videoInfo.videoId} 
                 seekTime={seekTime} 
                 endTime={endTime} 
@@ -485,6 +529,8 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                 onStartChange={setStartTime}
                 onEndChange={setEndTime}
                 onSeek={handleSeek}
+                onPlay={handlePlay}
+                onPause={handlePause}
               />
 
               <div className="max-w-2xl mx-auto w-full">
@@ -534,42 +580,60 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   )}
                 </div>
 
-                <div className={`flex flex-col sm:flex-row gap-4 mt-6 ${!completedClip ? 'space-y-0' : ''}`}>
-                  <Button 
-                    onClick={() => {
-                      if (completedClip) {
-                        setCompletedClip(null);
-                      } else {
-                        handleClip();
-                      }
-                    }} 
-                    disabled={processing || (endTime - startTime) <= 0} 
-                    className={`h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 ${
-                      completedClip ? 'flex-1 bg-gray-200 text-gray-600 hover:bg-gray-300' : 'w-full bg-[#5875F5] hover:bg-[#4763E4]'
-                    }`}
-                  >
-                    {processing ? (
-                      <>
-                        <Loader2 className="mr-3 h-7 w-7 animate-spin" />
-                        {format === 'mp3' ? 'CUTTING AUDIO...' : 'CUTTING VIDEO...'}
-                      </>
-                    ) : (
-                      <>
-                        {completedClip ? <X className="mr-3 h-7 w-7" /> : <Scissors className="mr-3 h-7 w-7" />}
-                        {completedClip ? 'CANCEL' : (format === 'mp3' ? 'CUT AUDIO' : 'CUT VIDEO')}
-                      </>
-                    )}
-                  </Button>
+                <div className="flex flex-col gap-4 mt-6">
+                  {completedClip ? (
+                    <>
+                      {completedClip.downloadUrl && (
+                        <a 
+                          href={completedClip.downloadUrl}
+                          download={`${(completedClip.title || 'clip').replace(/[^a-z0-9]/gi, '_')}.${completedClip.format || 'mp4'}`}
+                          className="w-full h-16 flex items-center justify-center gap-3 text-xl font-black rounded-3xl bg-green-600 hover:bg-green-700 text-white shadow-2xl transition-all hover:-translate-y-1 active:scale-95 animate-in zoom-in duration-300"
+                        >
+                          <Download className="h-7 w-7" />
+                          DOWNLOAD
+                        </a>
+                      )}
+                      
+                      <button
+                        onClick={() => setCompletedClip(null)}
+                        className="text-gray-700 hover:text-gray-300 text-sm font-black tracking-widest uppercase transition-colors py-2 flex items-center justify-center gap-2 mx-auto"
+                      >
+                        <X className="h-4 w-4" />
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className={`flex flex-col sm:flex-row gap-4 ${!completedClip ? 'space-y-0' : ''}`}>
+                        <Button 
+                          onClick={handleClip} 
+                          disabled={processing || (endTime - startTime) <= 0} 
+                          className="w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 bg-[#5875F5] hover:bg-[#4763E4]"
+                        >
+                          {processing ? (
+                            <>
+                              <Loader2 className="mr-3 h-7 w-7 animate-spin" />
+                              {format === 'mp3' ? 'CUTTING AUDIO...' : 'CUTTING VIDEO...'}
+                            </>
+                          ) : (
+                            <>
+                              {format === 'mp3' ? <Scissors className="mr-3 h-7 w-7" /> : <Scissors className="mr-3 h-7 w-7" />}
+                              {format === 'mp3' ? 'CUT AUDIO' : 'CUT VIDEO'}
+                            </>
+                          )}
+                        </Button>
+                      </div>
 
-                  {completedClip && completedClip.downloadUrl && (
-                    <a 
-                      href={completedClip.downloadUrl}
-                      download={`${(completedClip.title || 'clip').replace(/[^a-z0-9]/gi, '_')}.${completedClip.format || 'mp4'}`}
-                      className="flex-1 h-16 flex items-center justify-center gap-3 text-xl font-black rounded-3xl bg-green-600 hover:bg-green-700 text-white shadow-2xl transition-all hover:-translate-y-1 active:scale-95 animate-in zoom-in duration-300"
-                    >
-                      <Download className="h-7 w-7" />
-                      DOWNLOAD
-                    </a>
+                      {processing && (
+                        <button
+                          onClick={handleCancelProcessing}
+                          className="text-gray-700 hover:text-gray-300 text-sm font-black tracking-widest uppercase transition-colors py-2 flex items-center justify-center gap-2 mx-auto"
+                        >
+                          <X className="h-4 w-4" />
+                          Cancel
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -672,6 +736,52 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Duration Limit Error Modal */}
+      {showDurationModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+              <div 
+                  className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" 
+                  onClick={() => setShowDurationModal(false)}
+              />
+              <div className="relative bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 p-8 max-w-md w-full animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+                  <div className="flex flex-col items-center text-center space-y-6">
+                      <div className="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center text-orange-500">
+                          <AlertCircle className="w-10 h-10 stroke-[2.5]" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Clip Too Long!</h2>
+                          <p className="text-gray-500 font-medium leading-relaxed">
+                              The selected clip duration exceeds our current processing limit.
+                          </p>
+                      </div>
+
+                      {durationLimitError && (
+                          <div className="w-full grid grid-cols-2 gap-4">
+                              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Selection</p>
+                                  <p className="text-lg font-black text-orange-600">{durationLimitError.current}</p>
+                              </div>
+                              <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Max Limit</p>
+                                  <p className="text-lg font-black text-blue-600">{durationLimitError.max}</p>
+                              </div>
+                          </div>
+                      )}
+
+                      <div className="w-full pt-4">
+                          <Button 
+                              onClick={() => setShowDurationModal(false)}
+                              className="w-full h-14 bg-gray-900 hover:bg-black text-white rounded-2xl font-black text-sm tracking-widest shadow-xl transition-all active:scale-95"
+                          >
+                              UNDERSTOOD
+                          </Button>
+                      </div>
+                  </div>
+              </div>
+          </div>
       )}
     </div>
   );

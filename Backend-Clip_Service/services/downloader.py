@@ -24,6 +24,10 @@ class VideoDownloader:
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
+            'socket_timeout': settings.socket_timeout,
+            'http_chunk_size': 10485760,  # 10MB chunks
+            'ratelimit': 100000,  # Prevent rate limiting pauses
+            'noproxy': False,
         }
         
         if self.yt_dlp_path:

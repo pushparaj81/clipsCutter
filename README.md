@@ -1,3 +1,21 @@
+# Activate the environment in Git Bash
+
+source venv/Scripts/activate
+
+
+ 
+# Start the API
+
+python -m uvicorn app.main:app --reload --port 8000
+ 
+source venv/Scripts/activate
+
+pip install -r requirements.txt
+
+python -m celery -A workers.celery_app worker --loglevel=info -P solo -Q clips,celery
+
+
+
 # Clips Cutter
 
 A web application to clip YouTube videos by specifying a start and end time, built with Next.js, Prisma, and PostgreSQL. similar to [clipscutter.com](https://clipscutter.com).

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, Integer, DateTime
+from sqlalchemy import Column, String, Float, Integer, BigInteger, DateTime
 from sqlalchemy.sql import func
 from app.database import Base
 import uuid
@@ -19,7 +19,7 @@ class Clip(Base):
     title = Column(String, nullable=True)
     error = Column(String, nullable=True)
     progress = Column(Integer, nullable=False, default=0)
-    fileSize = Column(Integer, nullable=True)
+    fileSize = Column(BigInteger, nullable=True)
     filePath = Column(String, nullable=True)
     downloadUrl = Column(String, nullable=True)
     createdAt = Column(DateTime(timezone=True), server_default=func.now())

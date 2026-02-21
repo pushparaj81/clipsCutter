@@ -36,7 +36,7 @@ export default function Footer() {
 
       {/* Copyright Bar */}
       <div className="bg-black py-3 text-center">
-        <p className="text-white text-sm font-medium tracking-wide">
+        <p className="text-white text-xs lg:text-sm font-medium tracking-wide">
           MagicCutter.com® | Copyright 2026. All Rights Reserved.
         </p>
       </div>

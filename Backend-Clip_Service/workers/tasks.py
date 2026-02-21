@@ -125,6 +125,16 @@ def process_clip(
         start_process_time = time.time()
         logger.info(f"[Worker] Downloading {video_id} [{start_time}-{end_time}] as {format}")
         
+        # Define progress callback
+        def update_progress(p: float):
+            try:
+                # Need to use a new session or the existing one depending on thread safety
+                # Since yt_dlp runs in the same thread (mostly), this might be safe
+                clip.progress = int(p)
+                db.commit()
+            except Exception as e:
+                pass
+                
         downloader.download_section(
             video_id=video_id,
             start_time=start_time,
@@ -132,6 +142,7 @@ def process_clip(
             output_path=output_path,
             format=format,
             quality=quality,
+            progress_callback=update_progress,
             cancellation_check=is_cancelled
         )
         download_duration = time.time() - start_process_time

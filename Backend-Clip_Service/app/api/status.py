@@ -10,6 +10,25 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/progress")
+async def get_progress(
+    clip_id: str = Query(..., description="The ID of the clip"),
+    db: Session = Depends(get_db)
+):
+    """Simple endpoint to return only progress percentage for HTTP polling"""
+    try:
+        clip = db.query(Clip).filter(Clip.id == clip_id).first()
+        if not clip:
+            raise HTTPException(status_code=404, detail="Clip not found")
+        
+        return {"progress": float(clip.progress) if clip.progress is not None else 0.0}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Progress check error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{id}", response_model=ClipStatus)
 async def get_clip_status(
     id: str,

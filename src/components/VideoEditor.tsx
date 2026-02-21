@@ -96,14 +96,14 @@ const QualitySelect = ({
     <div ref={containerRef} className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold shadow-sm hover:border-blue-500 transition-colors min-w-[100px] justify-between"
+        className="flex items-center gap-1 sm:gap-2 bg-white border border-gray-200 rounded-lg sm:rounded-xl px-2 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold shadow-sm hover:border-blue-500 transition-colors min-w-[70px] sm:min-w-[100px] justify-between"
       >
         <span>{selectedLabel}</span>
         <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       
       {isOpen && (
-        <div className="absolute top-full mt-2 left-0 w-full min-w-[140px] bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full mt-1 sm:mt-2 left-0 w-full min-w-[90px] sm:min-w-[140px] bg-white border border-gray-100 rounded-lg sm:rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="max-h-[150px] overflow-y-auto">
             {options.map((opt) => (
               <button
@@ -112,7 +112,7 @@ const QualitySelect = ({
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-gray-50 flex items-center justify-between ${
+                className={`w-full text-left px-2 sm:px-4 py-2 sm:py-2.5 text-[12px] sm:text-xs font-bold hover:bg-gray-50 flex items-center justify-between ${
                   String(value) === String(opt.value) ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600'
                 }`}
               >
@@ -188,21 +188,52 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     try {
       setLoadingClips(true);
       const localClips = getStoredClips(videoId);
-      setClips(localClips);
+
+      // Fetch true state directly from backend DB instead of relying purely on localStorage 
+      const res = await fetch(`/api/clips/video/${videoId}`, { cache: 'no-store' });
+      if (res.ok) {
+        const backendClips: Clip[] = await res.json();
+        
+        // Use local storage as the exact source-of-truth for WHICH clips to show.
+        // Only use the backend response to UPDATE the status of those specific clips.
+        const updatedClips = localClips.map(localClip => {
+            const backendMatch = backendClips.find(bc => bc.id === localClip.id);
+            if (backendMatch) {
+                return { ...localClip, ...backendMatch };
+            }
+            return localClip;
+        });
+        
+        setClips(updatedClips);
+        saveClipsToStorage(videoId, updatedClips);
+      } else {
+        setClips(localClips);
+      }
       setStorageStatus('');
     } catch (err) {
       console.error('Error fetching clips:', err);
+      setClips(getStoredClips(videoId));
     } finally {
       setLoadingClips(false);
     }
-  }, [videoId, getStoredClips]);
+  }, [videoId, getStoredClips, saveClipsToStorage]);
 
-  // Load initial from local storage
+  // Load initial from local storage and setup cross-tab sync
   useEffect(() => {
     if (videoId) {
         setClips(getStoredClips(videoId));
     }
-  }, [videoId, getStoredClips]);
+
+    const handleStorage = (e: StorageEvent) => {
+        if (e.key === `clips_${videoId}`) {
+            // Re-fetch from database if storage changes to ensure syncing live status
+            fetchClips();
+        }
+    };
+    
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [videoId, getStoredClips, fetchClips]);
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -388,13 +419,19 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
  
       pollIntervalRef.current = setInterval(async () => {
         try {
+          // Poll the specific /progress endpoint as requested (note: proxied under /api/clips)
+          const progRes = await fetch(`/api/clips/progress?clip_id=${clipId}`);
+          const progData = await progRes.json();
+          
+          // Poll the main status endpoint to check for COMPLETED/FAILED
           const statusRes = await fetch(`/api/clips/${clipId}`);
           const statusData = await statusRes.json();
           
           const currentLocal = getStoredClips(videoInfo.videoId);
           const index = currentLocal.findIndex(c => c.id === clipId);
           if (index !== -1) {
-            currentLocal[index] = { ...currentLocal[index], ...statusData };
+            // Merge progress specifically from the progData, and other status info from statusData
+            currentLocal[index] = { ...currentLocal[index], ...statusData, progress: progData.progress };
             saveClipsToStorage(videoInfo.videoId, currentLocal);
             setClips([...currentLocal]);
           }
@@ -404,11 +441,27 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
               clearInterval(pollIntervalRef.current);
               pollIntervalRef.current = null;
             }
-            fetchClips();
+            
+            // Artificial delay to let the user visually see the 100% progress bar 
+            // complete its transition before jumping immediately to the download button
             if (currentJobIdRef.current === clipId) {
-              setCompletedClip({ ...statusData, id: clipId });
-              setProcessing(false);
+                // Set to 100% locally to force full progress bar rendering
+                const finalDb = getStoredClips(videoInfo.videoId);
+                const finalIdx = finalDb.findIndex(c => c.id === clipId);
+                if (finalIdx !== -1) {
+                    finalDb[finalIdx] = { ...finalDb[finalIdx], progress: 100 };
+                    setClips([...finalDb]);
+                }
+                
+                setTimeout(() => {
+                    fetchClips();
+                    setCompletedClip({ ...statusData, id: clipId });
+                    setProcessing(false);
+                }, 1200);
+            } else {
+                fetchClips();
             }
+            
           } else if (statusData.status === 'FAILED') {
             if (pollIntervalRef.current) {
               clearInterval(pollIntervalRef.current);
@@ -428,7 +481,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
         } catch (err) {
           console.error('Polling error:', err);
         }
-      }, 2000);
+      }, 3000);
 
     } catch (err: unknown) {
       console.error('HandleClip Error:', err);
@@ -461,6 +514,18 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     if (!videoId) return;
     try {
       if (!silent) setLoadingClips(true);
+      
+      // Actively hunt down and kill any running backend tasks before deleting from local storage
+      clips.forEach(async (clip) => {
+          if (clip.status === 'PROCESSING' || clip.status === 'PENDING') {
+              try {
+                  await fetch(`/api/clips/${clip.id}/cancel`, { method: 'POST' });
+              } catch (e) {
+                  console.error('Failed to cancel clip during clear', e);
+              }
+          }
+      });
+      
       // Optimistically clear local state and storage
       setClips([]);
       localStorage.removeItem(`clips_${videoId}`);
@@ -500,7 +565,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   }`}
               >
                   CLIPS
-                  {clips.length > 0 && <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">{clips.length}</span>}
+                  {clips.filter(c => c.status !== 'FAILED' && c.status !== 'CANCELLED').length > 0 && <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">{clips.filter(c => c.status !== 'FAILED' && c.status !== 'CANCELLED').length}</span>}
               </button>
           </div>
       </div>
@@ -537,13 +602,13 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
               />
 
               <div className="max-w-2xl mx-auto w-full">
-                <div className="flex flex-wrap items-center justify-center gap-6 mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <div className="flex items-center justify-between sm:justify-center gap-2 sm:gap-6 mb-4 sm:mb-8 bg-gray-50 p-2 sm:p-4 rounded-2xl border border-gray-100 w-full">
                   <div className="flex bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
                     {['mp4', 'mp3'].map((f) => (
                       <button
                         key={f}
                         onClick={() => setFormat(f)}
-                        className={`px-6 py-2 rounded-lg text-xs font-black transition-all ${
+                        className={`px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg text-xs font-black transition-all ${
                           format === f 
                             ? 'bg-blue-600 text-white shadow-lg' 
                             : 'text-gray-600 hover:bg-gray-100'
@@ -555,8 +620,8 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   </div>
 
                   {format === 'mp3' ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="hidden sm:inline-block text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
                       <QualitySelect 
                         value={quality === '128' || quality === '320' ? quality : '128'}
                         onChange={(val) => setQuality(val)}
@@ -568,8 +633,8 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                     </div>
                   ) : (
                     videoInfo.availableQualities?.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="hidden sm:inline-block text-xs font-black text-gray-400 uppercase tracking-widest">Quality:</span>
                         <QualitySelect 
                           value={quality}
                           onChange={(val) => setQuality(val)}
@@ -583,7 +648,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-4 mt-6">
+                <div className="flex flex-col lg:gap-4 gap-2 lg:mt-6 mt-2">
                   {completedClip ? (
                     <>
                       {completedClip.downloadUrl && (
@@ -629,30 +694,41 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                        <div className="flex items-center justify-between mb-4 px-2">
                           <div className="flex flex-col">
                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                SELECTION DURATION : <span className="text-gray-600 text-[14px]">{formatDuration(endTime - startTime)}</span>
+                                SELECTION DURATION : <span className="text-gray-600 text-[10px] lg:text-[14px]">{formatDuration(endTime - startTime)}</span>
                              </span>
                           </div>
                        </div>
-                      <div className={`flex flex-col sm:flex-row gap-4 ${!completedClip ? 'space-y-0' : ''}`}>
-                         <Button 
-                           onClick={handleClip} 
-                           disabled={processing || (endTime - startTime) <= 0} 
-                           className="w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 bg-[#5875F5] hover:bg-[#4763E4]"
-                         >
-                          {processing ? (
-                            <>
-                              <Loader2 className="mr-3 h-7 w-7 animate-spin" />
-                              {format === 'mp3' 
-                                ? 'CUTTING AUDIO...' 
-                                : 'CUTTING VIDEO...'}
-                            </>
-                          ) : (
-                            <>
-                              {format === 'mp3' ? <Scissors className="mr-3 h-7 w-7" /> : <Scissors className="mr-3 h-7 w-7" />}
-                              {format === 'mp3' ? 'CUT AUDIO' : 'CUT VIDEO'}
-                            </>
-                          )}
-                        </Button>
+                       <div className={`flex flex-col sm:flex-row gap-4 ${!completedClip ? 'space-y-0' : ''}`}>
+                         <div className="w-full relative">
+                           <Button 
+                             onClick={handleClip} 
+                             disabled={processing || (endTime - startTime) <= 0} 
+                             className="w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:opacity-100 relative overflow-hidden"
+                           >
+                            {/* Animated Background Progress Fill inside the button */}
+                            {processing && (
+                              <div 
+                                className="absolute top-0 left-0 h-full bg-linear-to-r from-blue-400 to-blue-600 transition-all duration-300 ease-out z-0" 
+                                style={{ width: `${clips.find(c => c.id === currentJobIdRef.current)?.progress || 0}%` }}
+                              />
+                            )}
+                            
+                            {processing ? (
+                              <div className="relative z-10 flex items-center justify-center w-full text-white ">
+                                <Loader2 className="mr-3 h-7 w-7 animate-spin" />
+                                <span>{format === 'mp3' ? 'CUTTING AUDIO...' : 'CUTTING VIDEO...'}</span>
+                                <span className="ml-2 font-mono tabular-nums">
+                                  {clips.find(c => c.id === currentJobIdRef.current)?.progress ? `${Math.round(clips.find(c => c.id === currentJobIdRef.current)?.progress as number)}%` : '0%'}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="relative z-10 flex items-center justify-center text-white">
+                                {format === 'mp3' ? <Scissors className="mr-3 h-7 w-7" /> : <Scissors className="mr-3 h-7 w-7" />}
+                                {format === 'mp3' ? 'CUT AUDIO' : 'CUT VIDEO'}
+                              </div>
+                            )}
+                          </Button>
+                        </div>
                       </div>
 
                       {processing && (
@@ -672,9 +748,9 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
             </div>
           ) : (
             <div className="space-y-6 max-w-3xl mx-auto">
-              <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-black text-gray-800 uppercase tracking-tight">Recent Clips</h2>
-                  <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <h2 className="text-xl sm:text-2xl font-black text-gray-800 uppercase tracking-tight">Recent Clips</h2>
+                  <div className="flex items-center justify-between lg:justify-end gap-2 w-full sm:w-auto">
                       {storageStatus && (
                           <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
                               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -704,14 +780,14 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   </div>
               ) : (
                   <div className="grid gap-4">
-                      {clips.filter(c => c.status !== 'FAILED').map((clip) => (
-                          <div key={clip.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm hover:shadow-md transition-all flex items-center gap-4 group">
-                              <div className={`p-3 rounded-2xl ${clip.format === 'mp3' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
-                                  {clip.format === 'mp3' ? <Music className="h-5 w-5" /> : <Video className="h-5 w-5" />}
+                      {clips.filter(c => c.status !== 'FAILED' && c.status !== 'CANCELLED').map((clip) => (
+                          <div key={clip.id} className="bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 group">
+                              <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl w-10 h-10 sm:w-auto sm:h-auto flex items-center justify-center shrink-0 ${clip.format === 'mp3' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
+                                  {clip.format === 'mp3' ? <Music className="h-4 w-4 sm:h-5 sm:w-5" /> : <Video className="h-4 w-4 sm:h-5 sm:w-5" />}
                               </div>
-                              <div className="space-y-1 flex-1 pr-4">
-                                  <h3 className="font-bold text-gray-900 line-clamp-1">{clip.title || 'Untitled Clip'}</h3>
-                                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                              <div className="space-y-1 flex-1 pr-0 sm:pr-4">
+                                  <h3 className="font-bold text-sm sm:text-base text-gray-900 line-clamp-1 sm:line-clamp-1">{clip.title || 'Untitled Clip'}</h3>
+                                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400">
                                       <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600">{clip.format}</span>
                                       {clip.quality && (
                                           <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600">
@@ -729,35 +805,46 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                                       <span className="ml-auto text-gray-500 font-bold">{getRelativeTime(clip.createdAt)}</span>
                                   </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center justify-end w-full sm:w-auto gap-2 border-t sm:border-t-0 border-gray-50 pt-3 sm:pt-0 mt-2 sm:mt-0">
                                   {clip.status === 'COMPLETED' && clip.downloadUrl ? (
                                       <a 
                                           href={clip.downloadUrl}
                                           download={`${(clip.title || 'clip').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_')}.${clip.format || 'mp4'}`}
-                                          className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-110"
+                                          className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-0 bg-green-600 hover:bg-green-700 text-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-md transition-all sm:hover:scale-110"
                                       >
-                                          <Download className="h-5 w-5" />
+                                          <Download className="h-4 w-4 sm:h-5 sm:w-5" /> 
+                                          <span className="sm:hidden text-xs font-black">DOWNLOAD</span>
                                       </a>
                                   ) : clip.status === 'FAILED' ? (
-                                      <div className="bg-red-50 text-red-600 p-3 rounded-2xl" title="Failed to process">
-                                          <AlertCircle className="h-5 w-5" />
+                                      <div className="flex-1 sm:flex-none flex items-center justify-center bg-red-50 text-red-600 p-2 sm:p-3 rounded-xl sm:rounded-2xl" title="Failed to process">
+                                          <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                                       </div>
                                   ) : (
-                                      <div className="flex flex-col items-center justify-center bg-blue-50 text-blue-600 px-3 py-2 rounded-2xl min-w-[60px]">
-                                          <Loader2 className="h-5 w-5 animate-spin" />
-                                          {clip.progress > 0 && <span className="text-[10px] font-black mt-1">{clip.progress}%</span>}
+                                      <div className="flex-1 sm:flex-none flex flex-col items-center justify-center bg-blue-50 text-blue-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl min-w-[50px] sm:min-w-[60px]">
+                                          <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                                          {clip.progress > 0 && <span className="text-[9px] sm:text-[10px] font-black mt-1">{clip.progress}%</span>}
                                       </div>
                                   )}
                                   <button 
-                                      onClick={() => {
+                                      onClick={async () => {
+                                          // Optimistically remove from UI
                                           const updatedClips = clips.filter(c => c.id !== clip.id);
                                           setClips(updatedClips);
                                           saveClipsToStorage(videoInfo.videoId, updatedClips);
+                                          
+                                          // Tell backend to cancel if it's running
+                                          if (clip.status === 'PROCESSING' || clip.status === 'PENDING') {
+                                              try {
+                                                  await fetch(`/api/clips/${clip.id}/cancel`, { method: 'POST' });
+                                              } catch (e) {
+                                                  console.error('Failed to cancel clip', e);
+                                              }
+                                          }
                                       }}
-                                      className="ml-2 p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                      className="p-2 sm:p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg sm:rounded-xl transition-all ml-auto sm:ml-0"
                                       title="Delete Clip"
                                   >
-                                      <Trash2 className="h-5 w-5" />
+                                      <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
                                   </button>
                               </div>
                           </div>

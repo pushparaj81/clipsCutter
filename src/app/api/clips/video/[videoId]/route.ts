@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ videoId: string }> }
@@ -7,7 +9,7 @@ export async function GET(
     try {
         const { videoId } = await params;
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/video/${videoId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/video/${videoId}`, { cache: 'no-store' });
 
         if (!response.ok) {
             const errorData = await response.json();

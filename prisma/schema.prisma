@@ -19,7 +19,7 @@ model Clip {
   title       String?  // New: Store video title
   error       String?  // New: Store error message if failed
   progress    Int      @default(0) // New: Store processing progress (0-100)
-  fileSize    Int?     // New: Size of the clipped file in bytes
+  fileSize    BigInt?  // New: Size of the clipped file in bytes
   filePath    String?
   downloadUrl String?
   createdAt   DateTime @default(now())

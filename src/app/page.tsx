@@ -100,10 +100,10 @@ function HomeContent() {
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16 animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="text-center space-y-6">
-              <h1 className="text-7xl md:text-8xl font-black text-[#333333] tracking-tighter">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#333333] tracking-tighter">
                 YouTube Video Cutter
               </h1>
-              <p className="max-w-2xl mx-auto text-2xl text-gray-500 leading-relaxed font-light">
+              <p className="max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl text-gray-500 leading-relaxed font-light">
                 Skip the hassle of downloading full videos. Just get your favorite clip by
                 entering a link and selecting your desired duration.
               </p>
@@ -111,27 +111,28 @@ function HomeContent() {
 
             {/* Pill Input Container */}
             <div className="max-w-4xl mx-auto w-full relative">
-              <form onSubmit={handleFetchInfo} className="flex items-center bg-white rounded-full p-3 pl-10 shadow-xl hover:shadow-2xl transition-all duration-300 focus-within:shadow-2xl ring-0 ring-white/50 focus-within:ring-4 focus-within:ring-blue-100">
+              <form onSubmit={handleFetchInfo} className="flex items-center bg-white rounded-full p-2 pl-4 sm:p-3 sm:pl-10 shadow-xl hover:shadow-2xl transition-all duration-300 focus-within:shadow-2xl ring-0 ring-white/50 focus-within:ring-4 focus-within:ring-blue-100">
                 <input
                   type="text"
                   placeholder="Paste YouTube link here..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="flex-1 bg-transparent border-none text-xl text-gray-600 placeholder:text-gray-300 focus:outline-none focus:ring-0"
+                  className="flex-1 w-full bg-transparent border-none text-base sm:text-xl text-gray-600 placeholder:text-gray-300 focus:outline-none focus:ring-0 min-w-0"
                 />
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="bg-[#5875F5] hover:bg-[#4763E4] text-white px-12 py-4 rounded-full font-black text-lg tracking-widest transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 shadow-lg"
+                  className="bg-[#5875F5] hover:bg-[#4763E4] text-white px-5 sm:px-12 py-3 sm:py-4 rounded-full font-black text-sm sm:text-lg tracking-widest transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 shadow-lg shrink-0 ml-2 sm:ml-0"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
-                      <Loader2 className="animate-spin h-6 w-6" />
+                      <Loader2 className="animate-spin h-5 w-5 sm:h-6 sm:w-6" />
+                      <span className="hidden sm:inline">Searching</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <Search className="h-5 w-5" />
-                      <span>Search</span>
+                      <span className="hidden sm:inline">Search</span>
                     </div>
                   )}
                 </button>
@@ -267,7 +268,7 @@ function HomeContent() {
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-24 pb-24 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
                     {/* Text Content */}
                     <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
-                        <h2 className="text-6xl sm:text-7xl font-black text-gray-900 leading-tight tracking-tight">
+                        <h2 className="text-4xl lg:text-6xl font-black text-gray-900 leading-tight tracking-tight">
                             Long Video to <br />
                             Short Video - <br />
                             <span className="text-[#333333]">Free Clip Maker</span>
@@ -309,24 +310,24 @@ function HomeContent() {
             <div className="w-full bg-linear-to-br from-[#0f172a] via-[#0c2a3a] to-[#0f2027]">
               <div className="py-24 space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-4xl mx-auto space-y-4">
-                    <h2 className="text-6xl md:text-7xl font-black text-white tracking-tight leading-tight">
+                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight">
                         Why use Magic Cutter&apos;s <br />
                         <span className="text-teal-400">online video cutter?</span>
                     </h2>
                 </div>
 
-                <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-24 relative">
+                <div className="flex flex-col lg:flex-row items-start gap-10 lg:gap-24 relative">
                     
                     {/* Left: Editor Visual (Sticky on Scroll) */}
-                    <div className="w-full lg:w-1/2 sticky top-32 self-start order-1">
-                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 aspect-auto h-[500px] w-full">
+                    <div className="w-full lg:w-1/2  lg:px-0 px-5 sticky lg:top-32 top-10 self-start order-1">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 aspect-auto lg:h-[500px] lg:w-full h-[300px] w-[300px]">
                            <video 
                               src="/videos/ocean_clips.mp4" 
                               autoPlay 
                               loop 
                               muted 
                               playsInline
-                              className="w-full h-full object-cover"
+                              className="w-[300px] h-[300px] lg:h-full lg:w-full object-cover"
                            />
                         </div>
                     </div>
@@ -451,8 +452,8 @@ function HomeContent() {
                     {/* Left: Steps */}
                     <div className="w-full lg:w-1/2 space-y-12">
                         <div className="space-y-4">
-                            <h2 className="text-6xl md:text-7xl font-black text-gray-900 tracking-tight">How to cut a video</h2>
-                            <p className="text-xl text-gray-500 font-medium leading-relaxed">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight">How to cut a video</h2>
+                            <p className="text-lg lg:text-xl  text-gray-500 font-medium leading-relaxed">
                                 Effortless video clipping made simple with just a few clicks.
                             </p>
                         </div>
@@ -495,14 +496,14 @@ function HomeContent() {
 
                     {/* Right: Surfer Visual */}
                     <div className="w-full h-auto lg:w-1/2">
-                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 h-[500px] w-full">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 lg:h-[500px] h-[300px] w-full">
                            <video 
                               src="/videos/yt_video.mp4" 
                               autoPlay 
                               loop 
                               muted 
                               playsInline
-                              className="w-full h-full object-cover"
+                              className="lg:w-full w-[350px] lg:h-full h-[300px] object-cover"
                            />
                         </div>
                     </div>
@@ -592,7 +593,7 @@ function HomeContent() {
           </>
         ) : (
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-linear-to-br from-blue-50/50 via-white to-blue-50/50 p-6 sm:p-8 rounded-[2.5rem] shadow-sm border border-white">
+          <div className="bg-linear-to-br from-blue-50/50 via-white to-blue-50/50 p-0  pt-7 sm:p-8 rounded-[2.5rem] shadow-sm border border-white">
             <VideoEditor 
               videoId={activeVideoId!} 
             />
@@ -602,9 +603,9 @@ function HomeContent() {
 
         {/* FAQ Section */}
         <div className="w-full bg-gray-200 border-y border-gray-200 mt-4">
-          <div className="py-24 space-y-16 max-w-4xl mx-auto px-4 w-full">
+          <div className="py-24 space-y-4 lg:space-y-16 max-w-4xl mx-auto px-4 w-full">
               <div className="text-center space-y-4">
-                  <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight">
+                  <h2 className="text-4xl md:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
                       Want to know more?
                   </h2>
               </div>

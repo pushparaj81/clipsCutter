@@ -193,7 +193,7 @@ export const WaveformTrim = ({
   const endPct = getPositionFromTime(endTime);
 
   return (
-    <div className="space-y-4 py-8">
+    <div className="space-y-4 py-0 lg:py-8">
       <div 
         ref={containerRef}
         className="relative h-20 bg-gray-100 rounded-lg select-none touch-none"
@@ -266,11 +266,15 @@ export const WaveformTrim = ({
       </div>
 
       {/* Time Display */}
-      <div className="flex items-center justify-between text-xs font-black text-gray-400 uppercase tracking-widest px-1">
-        <span className="w-16 text-center bg-gray-50 py-1 rounded-lg">0:00</span>
-        <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 px-4 py-2 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-black text-gray-400 uppercase tracking-widest px-1">
+        <div className="flex items-center justify-between w-full sm:w-auto px-2 sm:px-0">
+            <span className="w-12 sm:w-16 text-center bg-gray-50 py-1 rounded-md sm:rounded-lg">0:00</span>
+            <span className="sm:hidden w-12 text-center bg-gray-50 py-1 rounded-md">{formatTime(duration)}</span>
+        </div>
+        
+        <div className="flex justify-between items-center gap-1 sm:gap-3 bg-gray-50 border border-gray-100 px-1.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-sm w-full sm:w-auto overflow-hidden">
           {/* Start Time Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={handleStartDecrement}
               className="p-1 hover:bg-gray-200 rounded-md transition-colors text-gray-600 hover:text-[#5875F5]"
@@ -284,7 +288,7 @@ export const WaveformTrim = ({
               onChange={(e) => setStartInput(e.target.value)}
               onBlur={handleStartSubmit}
               onKeyDown={(e) => e.key === 'Enter' && handleStartSubmit(e)}
-              className="w-24 bg-white border border-gray-100 rounded-lg py-1 px-2 text-center text-sm text-gray-900 font-black focus:border-[#5875F5] focus:ring-2 focus:ring-[#5875F5]/20 focus:outline-none transition-all"
+              className="lg:w-30 w-20 bg-white border border-gray-100 rounded-lg py-1 px-1 sm:px-2 text-center text-xs sm:text-sm text-gray-900 font-black focus:border-[#5875F5] focus:ring-2 focus:ring-[#5875F5]/20 focus:outline-none transition-all"
             />
             <button
               onClick={handleStartIncrement}
@@ -314,18 +318,18 @@ export const WaveformTrim = ({
                 }, 250);  // Total delay: 250ms for pause + seek + play
               }
             }}
-            className="p-2 bg-blue-50 hover:bg-blue-100 text-[#5875F5] rounded-md transition-colors"
+            className="p-1.5 sm:p-2 bg-blue-50 hover:bg-blue-100 text-[#5875F5] rounded-md transition-colors mx-1 sm:mx-0 shrink-0"
             title={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
-              <Pause size={16} fill="currentColor" />
+              <Pause size={16} className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
             ) : (
-              <Play size={16} fill="currentColor" />
+              <Play size={16} className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
             )}
           </button>
 
           {/* End Time Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={handleEndDecrement}
               className="p-1 hover:bg-gray-200 rounded-md transition-colors text-gray-600 hover:text-[#5875F5]"
@@ -339,7 +343,7 @@ export const WaveformTrim = ({
               onChange={(e) => setEndInput(e.target.value)}
               onBlur={handleEndSubmit}
               onKeyDown={(e) => e.key === 'Enter' && handleEndSubmit(e)}
-              className="w-24 bg-white border border-gray-100 rounded-lg py-1 px-2 text-center text-sm text-gray-900 font-black focus:border-[#5875F5] focus:ring-2 focus:ring-[#5875F5]/20 focus:outline-none transition-all"
+              className="lg:w-30 w-20 bg-white border border-gray-100 rounded-lg py-1 px-1 sm:px-2 text-center text-xs sm:text-sm text-gray-900 font-black focus:border-[#5875F5] focus:ring-2 focus:ring-[#5875F5]/20 focus:outline-none transition-all"
             />
             <button
               onClick={handleEndIncrement}
@@ -350,7 +354,7 @@ export const WaveformTrim = ({
             </button>
           </div>
         </div>
-        <span className="w-16 text-center bg-gray-50 py-1 rounded-lg">{formatTime(duration)}</span>
+        <span className="hidden sm:inline-block w-16 text-center bg-gray-50 py-1 rounded-lg">{formatTime(duration)}</span>
       </div>
     </div>
   );

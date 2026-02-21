@@ -6,8 +6,10 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+        const searchParams = req.nextUrl.searchParams;
+        const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/${id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API_URL || 'http://localhost:8000'}/api/clips/${id}${queryString}`);
 
         if (!response.ok) {
             const errorData = await response.json();

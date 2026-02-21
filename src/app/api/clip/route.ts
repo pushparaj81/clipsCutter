@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clipQueue } from '@/lib/queue';
-import { prisma } from '@/lib/prisma';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -20,10 +18,11 @@ export async function POST(req: NextRequest) {
     const result = await response.json();
     return NextResponse.json(result);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('*** CLIP PROXY ERROR ***', error);
     return NextResponse.json(
-      { error: 'Failed to process clip', details: error.message },
+      { error: errorMessage },
       { status: 500 }
     );
   }

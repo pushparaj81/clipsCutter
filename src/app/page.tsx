@@ -162,7 +162,7 @@ function HomeContent() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
                     {/* Card 1 — Quick Processing (speed.png) */}
-                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
+                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.18)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
                         <h3 className="text-[17px] font-bold text-gray-900 leading-snug">Quick Processing</h3>
                         <p className="text-[13px] text-blue-400 font-medium mt-1 leading-relaxed">
                             Lightning fast processing for effortless clip cutting.
@@ -178,13 +178,13 @@ function HomeContent() {
                                 />
                             </div>
                             {/* Tooltip — overlapping bottom-left */}
-                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.08)] border border-gray-100 p-4 w-[50%] z-10">
+                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.18)] border border-gray-100 p-4 w-[50%] z-10">
                                 <p className="text-[12px] text-gray-500 font-medium leading-[1.5]">
                                     Seamless cutting, instant results for your favorite clips.
                                 </p>
                             </div>
                             {/* Tooltip 2 — Top Left Badge */}
-                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow">
+                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.16)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow">
                                 <div className="bg-orange-100 p-1.5 rounded-lg">
                                     <Zap className="w-3.5 h-3.5 text-orange-500" />
                                 </div>
@@ -194,7 +194,7 @@ function HomeContent() {
                     </div>
 
                     {/* Card 2 — HD Quality (mp4.png) */}
-                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
+                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.18)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
                         <h3 className="text-[17px] font-bold text-gray-900 leading-snug">HD Quality</h3>
                         <p className="text-[13px] text-blue-400 font-medium mt-1 leading-relaxed">
                             Download your clips in full HD quality.
@@ -210,13 +210,13 @@ function HomeContent() {
                                 />
                             </div>
                             {/* Tooltip — overlapping bottom-left */}
-                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.08)] border border-gray-100 p-4 w-[50%] z-10">
+                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.18)] border border-gray-100 p-4 w-[50%] z-10">
                                 <p className="text-[12px] text-gray-500 font-medium leading-[1.5]">
                                     Get high definition results for your favorite clips.
                                 </p>
                             </div>
                             {/* Tooltip 2 — Top Left Badge */}
-                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow delay-100">
+                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.16)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow delay-100">
                                 <div className="bg-blue-100 p-1.5 rounded-lg">
                                     <MonitorPlay className="w-3.5 h-3.5 text-blue-500" />
                                 </div>
@@ -226,7 +226,7 @@ function HomeContent() {
                     </div>
 
                     {/* Card 3 — MP3 Download (mp3.png) */}
-                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
+                    <div className="bg-white rounded-3xl p-6 pb-5 shadow-[0_2px_20px_rgba(0,0,0,0.18)] border border-gray-100 group hover:-translate-y-1 transition-all duration-300">
                         <h3 className="text-[17px] font-bold text-gray-900 leading-snug">MP3 Download</h3>
                         <p className="text-[13px] text-blue-400 font-medium mt-1 leading-relaxed">
                             Extract audio from videos and download as MP3.
@@ -242,13 +242,13 @@ function HomeContent() {
                                 />
                             </div>
                             {/* Tooltip — overlapping left */}
-                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.08)] border border-gray-100 p-4 w-[50%] z-10">
+                            <div className="absolute bottom-3 left-0 bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.18)] border border-gray-100 p-4 w-[50%] z-10">
                                 <p className="text-[12px] text-gray-500 font-medium leading-[1.5]">
                                     Convert any YouTube video to high-quality MP3 audio instantly.
                                 </p>
                             </div>
                             {/* Tooltip 2 — Top Left Badge */}
-                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow delay-200">
+                            <div className="absolute top-4 -left-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.16)] border border-gray-100 p-3 pr-4 z-10 flex items-center gap-2 animate-bounce-slow delay-200">
                                 <div className="bg-purple-100 p-1.5 rounded-lg">
                                     <Sparkles className="w-3.5 h-3.5 text-purple-500" />
                                 </div>
@@ -260,44 +260,50 @@ function HomeContent() {
                 </div>
             </div>
 
-            {/* Showcase Section: Long Video to Short Video */}
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-24 pb-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                {/* Text Content */}
-                <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
-                    <h2 className="text-6xl sm:text-7xl font-black text-gray-900 leading-tight tracking-tight">
-                        Long Video to <br />
-                        Short Video - <br />
-                        <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-indigo-600">Free Clip Maker</span>
-                    </h2>
-                    <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
-                        Repurpose one long video into multiple short videos automatically. 
-                        It&apos;s quick. It&apos;s free. It&apos;s the only video clip maker you&apos;ll need.
-                    </p>
-                    <button 
-                        onClick={() => document.querySelector('input')?.focus()}
-                        className="inline-flex items-center gap-2 bg-linear-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white px-8 py-4 rounded-full font-black text-lg tracking-wide shadow-lg shadow-cyan-500/30 transition-all transform hover:scale-105 active:scale-95"
-                    >
-                        Create Short Clips
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-up-right"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-                    </button>
-                </div>
+            {/* Showcase Section: Long Video to Short Video — Full-width background */}
+            </div> {/* Closing the previous max-w-7xl container to break out for full-width bg */}
+            <div className="w-full bg-gray-300 border-b border-gray-400 mt-6">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-24 pb-24 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                    {/* Text Content */}
+                    <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
+                        <h2 className="text-6xl sm:text-7xl font-black text-gray-900 leading-tight tracking-tight">
+                            Long Video to <br />
+                            Short Video - <br />
+                            <span className="text-[#333333]">Free Clip Maker</span>
+                        </h2>
+                        <p className="text-xl text-gray-700 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+                            Repurpose one long video into multiple short videos automatically. 
+                            It&apos;s quick. It&apos;s free. It&apos;s the only video clip maker you&apos;ll need.
+                        </p>
+                        <button 
+                            onClick={() => document.querySelector('input')?.focus()}
+                            className="inline-flex items-center gap-2 bg-[#5875F5] hover:bg-[#4763E4] text-white px-8 py-4 rounded-full font-black text-lg tracking-wide shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95"
+                        >
+                            Create Short Clips
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-up-right"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                        </button>
+                    </div>
 
-                {/* Visual Representation - Using provided image */}
-                <div className="lg:w-1/2 relative w-full max-w-2xl mx-auto group">
-                    {/* Background Glow */}
-                    <div className="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-30 transform scale-90 group-hover:opacity-50 transition-opacity duration-700"></div>
-                    
-                    <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white ring-1 ring-gray-100 transform -rotate hover:rotate-2 transition-all duration-700">
-                        <Image 
-                            src="/images/long_to_short.png" 
-                            alt="Long Video to Short Video Showcase" 
-                            width={1200}
-                            height={800}
-                            className="w-full h-auto object-cover"
-                        />
+                    {/* Visual Representation - Using provided image */}
+                    <div className="lg:w-1/2 relative w-full max-w-2xl mx-auto group">
+                        {/* Background Glow */}
+                        <div className="absolute inset-0 bg-white rounded-full blur-3xl opacity-20 transform scale-90 group-hover:opacity-40 transition-opacity duration-700"></div>
+                        
+                        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white ring-1 ring-gray-100 transform -rotate hover:rotate-2 transition-all duration-700">
+                            <Image 
+                                src="/images/long_to_short.png" 
+                                alt="Long Video to Short Video Showcase" 
+                                width={1200}
+                                height={800}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
                     </div>
                 </div>
+              </div>
             </div>
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16"> {/* Restarting the max-w-7xl container for subsequent sections */}
           </div>
             {/* Why Use Magic Cutter Section — Full-width background */}
             <div className="w-full bg-linear-to-br from-[#0f172a] via-[#0c2a3a] to-[#0f2027]">
@@ -311,8 +317,22 @@ function HomeContent() {
 
                 <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-24 relative">
                     
-                    {/* Left: Features List */}
-                    <div className="w-full lg:w-1/2 space-y-10 order-2 lg:order-1">
+                    {/* Left: Editor Visual (Sticky on Scroll) */}
+                    <div className="w-full lg:w-1/2 sticky top-32 self-start order-1">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 aspect-auto h-[500px] w-full">
+                           <video 
+                              src="/videos/ocean_clips.mp4" 
+                              autoPlay 
+                              loop 
+                              muted 
+                              playsInline
+                              className="w-full h-full object-cover"
+                           />
+                        </div>
+                    </div>
+
+                    {/* Right: Features List */}
+                    <div className="w-full lg:w-1/2 space-y-10 order-2">
                         {/* Feature 1 */}
                         <div className="flex gap-6 group">
                             <div className="shrink-0 flex items-start pt-1">
@@ -420,15 +440,6 @@ function HomeContent() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Right: Editor Visual (Sticky on Scroll) */}
-                    <div className="w-full lg:w-1/2 sticky top-32 self-start order-1 lg:order-2">
-                        <SurferPreview 
-                             imageSrc="/images/ocean_clips.png"
-                             alt="Surfer video editor preview"
-                             className="aspect-auto h-[500px] w-full"
-                        />
-                    </div>
                 </div>
               </div>
             </div>
@@ -483,11 +494,17 @@ function HomeContent() {
                     </div>
 
                     {/* Right: Surfer Visual */}
-                    <div className="w-full lg:w-1/2">
-                        <SurferPreview 
-                            imageSrc="/images/cutter.png"
-                            alt="How to cut a video preview"
-                        />
+                    <div className="w-full h-auto lg:w-1/2">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 h-[500px] w-full">
+                           <video 
+                              src="/videos/yt_video.mp4" 
+                              autoPlay 
+                              loop 
+                              muted 
+                              playsInline
+                              className="w-full h-full object-cover"
+                           />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -584,39 +601,41 @@ function HomeContent() {
         )}
 
         {/* FAQ Section */}
-        <div className="py-24 space-y-16 max-w-4xl mx-auto w-full">
-            <div className="text-center space-y-4">
-                <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight">
-                    Want to know more?
-                </h2>
-            </div>
-            
-            <div className="space-y-4">
-                {[
-                    {
-                        question: "How to cut a video clip online?",
-                        answer: "To cut a video online, simply paste your YouTube video link into the search box on Magic Cutter, then select the portion you want to keep using the sliders or time inputs, and click 'Cut Video' and click 'Download'. It's fast, free, and no registration is required."
-                    },
-                    {
-                        question: "What is the difference between cut video vs. trim vs. crop video?",
-                        answer: "Cutting and trimming usually refer to removing unwanted parts from the beginning or end of a video (shortening its duration). Cropping refers to changing the visual dimensions of the video frame (e.g., changing from 16:9 to 1:1 square), removing parts of the image itself."
-                    },
-                    {
-                        question: "What video file types can I export from Magic Cutter?",
-                        answer: "You can export your clips in MP4 format, which is widely supported across all devices and platforms. We ensure high-quality output with optimized video compression settings."
-                    },
-                    {
-                        question: "What's the maximum video length I can cut?",
-                        answer: "Magic Cutter works with YouTube videos of any length. Processing time depends on your internet connection and the video's duration. Shorter clips (under 30 minutes) process most reliably."
-                    },
-                    {
-                        question: "How to trim a video on iPhone or Android?",
-                        answer: "Magic Cutter is fully responsive and works great on mobile browsers. Just open magiccutter.com on your phone, paste your YouTube video link into the search box, drag the sliders to select your desired clip, and download the result directly to your device."
-                    }
-                ].map((faq, index) => (
-                    <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                ))}
-            </div>
+        <div className="w-full bg-gray-200 border-y border-gray-200 mt-4">
+          <div className="py-24 space-y-16 max-w-4xl mx-auto px-4 w-full">
+              <div className="text-center space-y-4">
+                  <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight">
+                      Want to know more?
+                  </h2>
+              </div>
+              
+              <div className="space-y-4">
+                  {[
+                      {
+                          question: "How to cut a video clip online?",
+                          answer: "To cut a video online, simply paste your YouTube video link into the search box on Magic Cutter, then select the portion you want to keep using the sliders or time inputs, and click 'Cut Video' and click 'Download'. It's fast, free, and no registration is required."
+                      },
+                      {
+                          question: "What is the difference between cut video vs. trim vs. crop video?",
+                          answer: "Cutting and trimming usually refer to removing unwanted parts from the beginning or end of a video (shortening its duration). Cropping refers to changing the visual dimensions of the video frame (e.g., changing from 16:9 to 1:1 square), removing parts of the image itself."
+                      },
+                      {
+                          question: "What video file types can I export from Magic Cutter?",
+                          answer: "You can export your clips in MP4 format, which is widely supported across all devices and platforms. We ensure high-quality output with optimized video compression settings."
+                      },
+                      {
+                          question: "What's the maximum video length I can cut?",
+                          answer: "Magic Cutter works with YouTube videos of any length. Processing time depends on your internet connection and the video's duration. Shorter clips (under 30 minutes) process most reliably."
+                      },
+                      {
+                          question: "How to trim a video on iPhone or Android?",
+                          answer: "Magic Cutter is fully responsive and works great on mobile browsers. Just open magiccutter.com on your phone, paste your YouTube video link into the search box, drag the sliders to select your desired clip, and download the result directly to your device."
+                      }
+                  ].map((faq, index) => (
+                      <FAQItem key={index} question={faq.question} answer={faq.answer} />
+                  ))}
+              </div>
+          </div>
         </div>
 
       
@@ -673,30 +692,3 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-function SurferPreview({ imageSrc, alt, className, transparent }: { imageSrc: string; alt: string; className?: string; transparent?: boolean }) {
-  if (transparent) {
-    return (
-      <div className={`relative ${className || 'aspect-video'}`}>
-        <Image 
-          src={imageSrc}
-          alt={alt}
-          fill
-          className="object-contain drop-shadow-2xl"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className={`relative rounded-2xl overflow-hidden shadow-2xl bg-gray-900 group border-4 border-white ring-1 ring-gray-100 transform rotate hover:rotate-2 transition-all duration-700 ${className || 'aspect-video'}`}>
-      <div className="absolute inset-0 bg-gray-900">
-          <Image 
-            src={imageSrc}
-            alt={alt}
-            fill
-            className="object-cover"
-          />
-      </div>
-    </div>
-  );
-}

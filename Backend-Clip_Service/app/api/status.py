@@ -106,3 +106,46 @@ async def delete_video_clips(
         db.rollback()
         logger.error(f"Delete clips error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{id}/cancel")
+async def cancel_clip(
+    id: str,
+    db: Session = Depends(get_db)
+):
+    """Cancel a running clip job"""
+    logger.info(f"Received cancellation request for job: {id}")
+    try:
+        clip = db.query(Clip).filter(Clip.id == id).first()
+        if not clip:
+            logger.warning(f"Clip not found for cancellation: {id}")
+            raise HTTPException(status_code=404, detail="Clip not found")
+        
+        # Set cancellation flag in Redis
+        try:
+            from redis import Redis
+            from app.config import settings
+            logger.info(f"Connecting to Redis at {settings.redis_url} for cancellation")
+            r = Redis.from_url(settings.redis_url)
+            r.setex(f"cancel_job:{id}", 3600, "1")  # Expire in 1 hour
+            logger.info(f"SUCCESS: Set cancellation flag in Redis for job: {id}")
+        except Exception as re:
+            logger.error(f"FAILED to set Redis cancel flag: {re}")
+
+        # Fallback to standard revocation
+        try:
+            celery_app.control.revoke(id, terminate=True)
+            logger.info(f"Sent Celery revoke signal for task: {id}")
+        except Exception as e:
+            logger.error(f"Error revoking Celery task {id}: {e}")
+        
+        # Update database status
+        clip.status = 'CANCELLED'
+        db.commit()
+        
+        return {"success": True, "message": "Task cancellation signal sent"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Cancel task endpoint error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

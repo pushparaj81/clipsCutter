@@ -80,6 +80,7 @@ export default function ClipsPage() {
   }, []);
 
   const handleDeleteClip = (clipId: string, videoId: string) => {
+    if (!confirm('Delete this clip from history?')) return;
     try {
         const key = `clips_${videoId}`;
         const stored = localStorage.getItem(key);
@@ -155,7 +156,7 @@ export default function ClipsPage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {clips.map((clip) => (
+            {clips.filter(c => c.status !== 'FAILED').map((clip) => (
                 <div key={clip.id} className="bg-white border border-gray-100 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center gap-6 group">
                     <div className={`p-4 rounded-2xl w-14 h-14 flex items-center justify-center shrink-0 ${clip.format === 'mp3' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
                         {clip.format === 'mp3' ? <Music className="h-6 w-6" /> : <Video className="h-6 w-6" />}
@@ -206,8 +207,7 @@ export default function ClipsPage() {
                             </div>
                         ) : (
                             <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl min-w-[120px]">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                <span className="text-xs font-black">{clip.progress}%</span>
+                                <span className="text-xs font-black uppercase tracking-widest">PROCESSING</span>
                             </div>
                         )}
                         

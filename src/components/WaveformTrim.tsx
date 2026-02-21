@@ -79,7 +79,7 @@ export const WaveformTrim = ({
 
   // Reset playing state when video reaches the end
   React.useEffect(() => {
-    if (currentTime !== undefined && currentTime >= endTime - 0.1) {
+    if (currentTime !== undefined && currentTime >= endTime) {
       // Stop playback immediately
       onPause?.();
       setIsPlaying(false);

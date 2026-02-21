@@ -1,7 +1,40 @@
 import yt_dlp
 import os
+import shutil
 from typing import Dict, Optional, Callable
 from app.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class CancellationLogger:
+    def __init__(self, base_logger, cancellation_check):
+        self.base_logger = base_logger
+        self.cancellation_check = cancellation_check
+
+    def debug(self, msg):
+        self._check()
+        self.base_logger.debug(msg)
+
+    def info(self, msg):
+        self._check()
+        self.base_logger.info(msg)
+
+    def warning(self, msg):
+        self._check()
+        self.base_logger.warning(msg)
+
+    def error(self, msg):
+        # If cancelling, downgrade errors to info to keep logs clean
+        if self.cancellation_check and self.cancellation_check():
+            self.base_logger.info(f"[Suppressing Error during Cancel] {msg}")
+        else:
+            self.base_logger.error(msg)
+
+    def _check(self):
+        if self.cancellation_check and self.cancellation_check():
+            raise Exception("Task cancelled by user (heartbeat)")
 
 
 class VideoDownloader:
@@ -13,12 +46,6 @@ class VideoDownloader:
     def get_metadata(self, url: str) -> Dict:
         """
         Fetch video metadata using yt-dlp
-        
-        Args:
-            url: YouTube video URL
-            
-        Returns:
-            Dictionary with video metadata
         """
         ydl_opts = {
             'quiet': True,
@@ -26,7 +53,6 @@ class VideoDownloader:
             'extract_flat': False,
             'socket_timeout': settings.socket_timeout,
             'http_chunk_size': 10485760,  # 10MB chunks
-            'ratelimit': 100000,  # Prevent rate limiting pauses
             'noproxy': False,
         }
         
@@ -67,61 +93,56 @@ class VideoDownloader:
         output_path: str,
         format: str = 'mp4',
         quality: Optional[str] = None,
-        progress_callback: Optional[Callable[[float], None]] = None
+        progress_callback: Optional[Callable[[float], None]] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None
     ) -> str:
         """
         Download specific video section using yt-dlp
-        
-        Args:
-            video_id: YouTube video ID
-            start_time: Start time in seconds
-            end_time: End time in seconds
-            output_path: Output file path
-            format: Output format (mp4, mp3, webm)
-            quality: Video quality (e.g., '720p')
-            progress_callback: Optional callback for progress updates
-            
-        Returns:
-            Path to downloaded file
         """
         url = f"https://www.youtube.com/watch?v={video_id}"
         
         # Ensure output directory exists
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # Progress hook
-        def progress_hook(d):
+        def yt_dlp_hook(d):
+            # Check for cancellation
+            if cancellation_check and cancellation_check():
+                logger.info("[Downloader] Cancellation signal detected in hook, aborting...")
+                raise Exception("Task cancelled by user")
+            
+            # Update progress
             if d['status'] == 'downloading' and progress_callback:
-                try:
-                    # Extract percentage from downloaded_bytes and total_bytes
-                    if 'downloaded_bytes' in d and 'total_bytes' in d:
-                        percent = (d['downloaded_bytes'] / d['total_bytes']) * 100
-                        progress_callback(percent)
-                    elif '_percent_str' in d:
-                        percent_str = d['_percent_str'].strip().replace('%', '')
-                        progress_callback(float(percent_str))
-                except:
-                    pass
-        
+                p = d.get('_percent_str', '0%').replace('%', '')
+                try: progress_callback(float(p))
+                except: pass
+
+        def postprocessor_hook(d):
+            if cancellation_check and cancellation_check():
+                logger.info("[Downloader] Cancellation detected in postprocessor, aborting...")
+                raise Exception("Task cancelled by user (postprocessor)")
+
         # Build yt-dlp options
         ydl_opts = {
             'format': self._get_format_string(format, quality),
             'outtmpl': output_path if output_path.endswith(f'.{format}') else f'{output_path}.%(ext)s',
-            'progress_hooks': [progress_hook],
+            'logger': CancellationLogger(logger, cancellation_check),
             'quiet': False,
             'no_warnings': False,
-            'noprogress': True,
-            'concurrent_fragment_downloads': 5,
-            'http_chunk_size': 10485760, # 10MB
+            'progress_hooks': [yt_dlp_hook],
+            'postprocessor_hooks': [postprocessor_hook],
+            'concurrent_fragment_downloads': 15,
+            'buffersize': 1024 * 1024, # 1MB buffer
+            'retries': 10,
+            'fragment_retries': 10,
         }
         
         # Force merge format if not mp3
         if format != 'mp3':
             ydl_opts['merge_output_format'] = format
             
-        # Add FFmpeg optimization args
+        # Add FFmpeg optimization args - strictly force 'copy'
         ydl_opts['postprocessor_args'] = {
-            'ffmpeg': ['-threads', '0', '-preset', 'veryfast']
+            'ffmpeg': ['-threads', '0', '-preset', 'ultrafast', '-c:v', 'copy', '-c:a', 'copy', '-map', '0']
         }
         
         # Add download range (section)
@@ -131,21 +152,21 @@ class VideoDownloader:
             )
         else:
             # Fallback for older yt-dlp versions
-            ydl_opts['postprocessor_args'] = [
-                '-ss', str(start_time),
-                '-to', str(end_time)
-            ]
+            ydl_opts['postprocessor_args']['ffmpeg'].extend(['-ss', str(start_time), '-to', str(end_time)])
         
         # MP3 specific options
         if format == 'mp3':
+            kbps = quality.replace('p', '').replace('k', '') if quality else '192'
             ydl_opts.update({
                 'format': 'bestaudio/best',
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
                     'preferredcodec': 'mp3',
-                    'preferredquality': quality.replace('p', '') if quality else '192',
+                    'preferredquality': kbps,
                 }]
             })
+            # Remove stream copying for MP3 conversion
+            ydl_opts['postprocessor_args']['ffmpeg'] = ['-threads', '0', '-preset', 'ultrafast']
         
         # Set custom binary paths if provided
         if self.yt_dlp_path:
@@ -163,27 +184,28 @@ class VideoDownloader:
             
             return output_path
         except Exception as e:
-            raise Exception(f"Download failed: {str(e)}")
+            error_msg = str(e)
+            # Re-check cancellation status because a hard-kill (code 15) might not say "cancelled"
+            if "cancelled" in error_msg.lower() or (cancellation_check and cancellation_check()):
+                logger.info(f"[Downloader] Stop signal processed (Exit/Abort): {error_msg}")
+                raise Exception("Task cancelled by user")
+            
+            logger.exception(f"[Downloader] Fatal download error for {video_id}")
+            raise Exception(f"Download failed: {error_msg}")
     
     def _get_format_string(self, format: str, quality: Optional[str]) -> str:
         """
         Generate yt-dlp format string
-        
-        Args:
-            format: Output format
-            quality: Video quality
-            
-        Returns:
-            Format string for yt-dlp
         """
         if format == 'mp3':
             return 'bestaudio/best'
         
         if quality:
             height = quality.replace('p', '')
-            return f'bestvideo[height<={height}][ext={format}]+bestaudio/best'
+            # Strictly prioritize H.264 (avc1) and AAC (m4a) for MP4 instant merging
+            return f'bestvideo[height<={height}][vcodec^=avc1]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio/best[height<={height}]/best'
         
-        return f'bestvideo[ext={format}]+bestaudio/best'
+        return f'bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/bestvideo+bestaudio/best'
 
 
 # Singleton instance

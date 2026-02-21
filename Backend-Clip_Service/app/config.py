@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
 
@@ -32,23 +32,25 @@ class Settings(BaseSettings):
     
     # File Storage
     temp_dir: str = "./public/temp"
-    max_file_age_hours: int = 1
+    max_file_age_hours: int = 6
     
     # Video Processing
-    max_clip_duration: int = 600  # 10 minutes
+    max_clip_duration: int = 3600  # 1 hour (synced with .env)
     max_concurrent_workers: int = 5
     
     # Timeouts (in seconds)
-    video_metadata_timeout: int = 120  # 2 minutes for metadata extraction
-    socket_timeout: int = 30  # socket timeout for network operations
+    video_metadata_timeout: int = 180  # 3 minutes (synced with .env)
+    socket_timeout: int = 60  # 60 seconds (synced with .env)
     
     # Optional binary paths
     yt_dlp_path: str | None = None
     ffmpeg_path: str | None = None
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../.env", "../../.env"),
+        case_sensitive=False,
+        extra="ignore"
+    )
 
 
 settings = Settings()

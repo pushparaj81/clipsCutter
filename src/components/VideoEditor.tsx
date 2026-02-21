@@ -43,9 +43,16 @@ const formatFileSize = (bytes?: number | null) => {
 };
 
 const formatDuration = (seconds: number) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.round(seconds % 60);
+  
+  const parts = [];
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (s > 0 || parts.length === 0) parts.push(`${s}s`);
+  
+  return parts.join(' ');
 };
 
 const getRelativeTime = (dateString: string) => {
@@ -124,6 +131,8 @@ interface VideoEditorProps {
   videoId: string;
 }
 
+const MAX_DURATION = Number(process.env.NEXT_PUBLIC_MAX_CLIP_DURATION) || 3600;
+
 export function VideoEditor({ videoId }: VideoEditorProps) {
   const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null);
   const [startTime, setStartTime] = useState(0);
@@ -145,10 +154,11 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
   const playerRef = useRef<VideoPlayerHandle>(null);
   const [storageStatus, setStorageStatus] = useState<string>('');
   const [completedClip, setCompletedClip] = useState<Clip | null>(null);
+
   
   // Modal for duration error
   const [showDurationModal, setShowDurationModal] = useState(false);
-  const [durationLimitError, setDurationLimitError] = useState<{current: string, max: string} | null>(null);
+  const [durationLimitError, setDurationLimitError] = useState<{current: string, max: string, message?: string} | null>(null);
   
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -177,42 +187,15 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     if (!videoId) return;
     try {
       setLoadingClips(true);
-      
       const localClips = getStoredClips(videoId);
+      setClips(localClips);
       setStorageStatus('');
-      
-      const res = await fetch(`/api/clips/video/${videoId}`);
-      const serverClips: Clip[] = await res.json();
-      
-      if (serverClips && !Array.isArray(serverClips)) {
-         setClips(localClips);
-         return;
-      }
-
-      const mergedMap = new Map<string, Clip>();
-      localClips.forEach(c => mergedMap.set(c.id, c));
-      
-      // Update local clips with server status, but DO NOT add new clips from server
-      serverClips.forEach(c => {
-          if (mergedMap.has(c.id)) {
-              mergedMap.set(c.id, { ...mergedMap.get(c.id)!, ...c });
-          }
-      });
-      
-      const mergedList = Array.from(mergedMap.values()).sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      setClips(mergedList);
-      saveClipsToStorage(videoId, mergedList);
     } catch (err) {
       console.error('Error fetching clips:', err);
-      setClips(getStoredClips(videoId));
-      setStorageStatus('Offline Mode: Using Local Storage');
     } finally {
       setLoadingClips(false);
     }
-  }, [videoId, getStoredClips, saveClipsToStorage]);
+  }, [videoId, getStoredClips]);
 
   // Load initial from local storage
   useEffect(() => {
@@ -307,6 +290,13 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
 
   const handlePlay = () => {
     if (playerRef.current) {
+      // If playhead is at the end or outside, restart from start
+      if (currentTime < startTime - 0.2 || currentTime >= endTime - 0.2) {
+        if (playerRef.current.seek) {
+          playerRef.current.seek(startTime);
+        }
+        handleSeek(startTime);
+      }
       playerRef.current.play();
     }
   };
@@ -317,28 +307,59 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     }
   };
 
-  const handleCancelProcessing = useCallback(() => {
+  const handleCancelProcessing = useCallback(async () => {
+    const jobId = currentJobIdRef.current;
+    
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
     }
+    
+    // Notify backend to kill the task
+    if (jobId && jobId !== 'initial') {
+      try {
+        await fetch(`/api/clips/${jobId}/cancel`, { method: 'POST' });
+      } catch (e) {
+        console.error('Failed to send cancel signal to backend', e);
+      }
+    }
+    
+    // Remove the cancelled clip from local storage
+    if (jobId && videoId) {
+      const currentLocal = getStoredClips(videoId);
+      const updated = currentLocal.filter(c => c.id !== jobId);
+      saveClipsToStorage(videoId, updated);
+      setClips(updated);
+    }
+
     currentJobIdRef.current = null;
     setProcessing(false);
     fetchClips();
-  }, [fetchClips]);
+  }, [videoId, getStoredClips, saveClipsToStorage, fetchClips]);
 
   const handleClip = async () => {
     if (!videoInfo) return;
     setProcessing(true);
     setError('');
-
     setCompletedClip(null);
-    
     currentJobIdRef.current = 'initial';
 
     try {
       const startTimeVal = startTime;
       const endTimeVal = endTime;
+      const duration = endTimeVal - startTimeVal;
+
+      // Client-side duration validation
+      if (duration > MAX_DURATION) {
+        setDurationLimitError({
+          current: formatDuration(duration),
+          max: formatDuration(MAX_DURATION),
+          message: `Your selection is ${formatDuration(duration)}, which exceeds our ${formatDuration(MAX_DURATION)} limit.`
+        });
+        setShowDurationModal(true);
+        setProcessing(false);
+        return;
+      }
 
       const res = await fetch('/api/clip', {
         method: 'POST',
@@ -359,19 +380,18 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
       const clipId = data.clipId;
       currentJobIdRef.current = clipId;
 
-      
       const newClip: Clip = {
-          id: clipId,
-          videoId: videoInfo.videoId,
-          title: 'Processing...',
-          status: 'PROCESSING',
-          format,
-          quality: format === 'mp3' ? null : quality,
-          startTime: startTimeVal,
-          endTime: endTimeVal,
-          progress: 0,
-          downloadUrl: null,
-          createdAt: new Date().toISOString()
+        id: clipId,
+        videoId: videoInfo.videoId,
+        title: 'Processing...',
+        status: 'PROCESSING',
+        format,
+        quality: format === 'mp3' ? null : quality,
+        startTime: startTimeVal,
+        endTime: endTimeVal,
+        progress: 0,
+        downloadUrl: null,
+        createdAt: new Date().toISOString()
       };
       
       const currentClips = getStoredClips(videoInfo.videoId);
@@ -387,35 +407,35 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           const currentLocal = getStoredClips(videoInfo.videoId);
           const index = currentLocal.findIndex(c => c.id === clipId);
           if (index !== -1) {
-              currentLocal[index] = { ...currentLocal[index], ...statusData };
-              saveClipsToStorage(videoInfo.videoId, currentLocal);
-              setClips([...currentLocal]);
+            currentLocal[index] = { ...currentLocal[index], ...statusData };
+            saveClipsToStorage(videoInfo.videoId, currentLocal);
+            setClips([...currentLocal]);
           }
 
           if (statusData.status === 'COMPLETED') {
             if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
             }
             fetchClips();
             if (currentJobIdRef.current === clipId) {
-                setCompletedClip({ ...statusData, id: clipId });
-                setProcessing(false);
+              setCompletedClip({ ...statusData, id: clipId });
+              setProcessing(false);
             }
           } else if (statusData.status === 'FAILED') {
             if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
             }
-            fetchClips();
-            if (currentJobIdRef.current === clipId) {
-                setError(statusData.error || 'Clipping failed');
-                setProcessing(false);
+            
+            const currentLocal = getStoredClips(videoInfo.videoId);
+            const updated = currentLocal.filter(c => c.id !== clipId);
+            saveClipsToStorage(videoInfo.videoId, updated);
+            setClips(updated);
 
-            }
-          } else {
             if (currentJobIdRef.current === clipId) {
-
+              setError(statusData.error || 'Clipping failed');
+              setProcessing(false);
             }
           }
         } catch (err) {
@@ -427,17 +447,22 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
       console.error('HandleClip Error:', err);
       const errorMessage = err instanceof Error ? err.message : String(err);
       
-      // Detect duration limit error
       if (errorMessage.toLowerCase().includes('exceeds maximum')) {
-          const match = errorMessage.match(/\(([\d.]+s?)\).*?\(([\d.]+s?)\)/);
-          if (match) {
-              setDurationLimitError({ current: match[1], max: match[2] });
-          } else {
-              setDurationLimitError({ current: 'Too long', max: '1 hour' });
-          }
-          setShowDurationModal(true);
+        const match = errorMessage.match(/\(([\d.]+s?)\).*?\(([\d.]+s?)\)/);
+        if (match) {
+          const currentSecs = parseFloat(match[1]);
+          const maxSecs = parseFloat(match[2]);
+          setDurationLimitError({ 
+            current: formatDuration(currentSecs), 
+            max: formatDuration(maxSecs),
+            message: errorMessage
+          });
+        } else {
+          setDurationLimitError({ current: 'Too long', max: formatDuration(MAX_DURATION), message: errorMessage });
+        }
+        setShowDurationModal(true);
       } else {
-          setError(errorMessage);
+        setError(errorMessage);
       }
       
       setProcessing(false);
@@ -448,13 +473,10 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
   const handleClearClips = async (silent = false) => {
     if (!videoId) return;
     try {
-      setLoadingClips(true);
+      if (!silent) setLoadingClips(true);
       // Optimistically clear local state and storage
       setClips([]);
       localStorage.removeItem(`clips_${videoId}`);
-      
-      // Attempt to clear on server
-      await fetch(`/api/clips/video/${videoId}`, { method: 'DELETE' });
     } catch (err) {
       console.error('Error clearing clips:', err);
     } finally {
@@ -463,7 +485,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
   };
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in zoom-in duration-500 mt-10">
+    <div className="w-full space-y-8 animate-in fade-in zoom-in duration-500 mt-4">
 
 
       {/* Tabs Navigation */}
@@ -496,12 +518,6 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
           </div>
       </div>
 
-      {error && (
-        <div className="max-w-2xl mx-auto bg-red-50 text-red-600 p-4 rounded-2xl flex items-center justify-center gap-2 border border-red-100 animate-in fade-in zoom-in">
-          <AlertCircle className="h-5 w-5" />
-          <span className="font-bold">{error}</span>
-        </div>
-      )}
 
       {/* Tab Content */}
       {!videoInfo ? (
@@ -586,7 +602,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                       {completedClip.downloadUrl && (
                         <a 
                           href={completedClip.downloadUrl}
-                          download={`${(completedClip.title || 'clip').replace(/[^a-z0-9]/gi, '_')}.${completedClip.format || 'mp4'}`}
+                          download={`${(completedClip.title || 'clip').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_')}.${completedClip.format || 'mp4'}`}
                           className="w-full h-16 flex items-center justify-center gap-3 text-xl font-black rounded-3xl bg-green-600 hover:bg-green-700 text-white shadow-2xl transition-all hover:-translate-y-1 active:scale-95 animate-in zoom-in duration-300"
                         >
                           <Download className="h-7 w-7" />
@@ -597,23 +613,62 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                       <button
                         onClick={() => setCompletedClip(null)}
                         className="text-gray-700 hover:text-gray-300 text-sm font-black tracking-widest uppercase transition-colors py-2 flex items-center justify-center gap-2 mx-auto"
-                      >
+                        >
                         <X className="h-4 w-4" />
                         Cancel
                       </button>
                     </>
                   ) : (
                     <>
+                       {error && (
+                         <div className="flex items-center gap-4 p-5 mb-6 bg-red-50 border-2 border-red-100 rounded-3xl animate-in slide-in-from-top-4 duration-300 shadow-sm">
+                           <div className="bg-red-100 p-2 rounded-xl text-red-600">
+                              <AlertCircle className="h-6 w-6" />
+                           </div>
+                           <div className="flex-1">
+                              <p className="text-xs font-black text-red-900 uppercase tracking-widest mb-1">Attention Required</p>
+                              <p className="text-sm font-bold text-red-600 leading-tight">{error}</p>
+                           </div>
+                           <button 
+                             onClick={() => setError('')} 
+                             className="bg-red-100/50 hover:bg-red-100 p-2 rounded-xl text-red-600 transition-colors"
+                           >
+                             <X className="h-5 w-5" />
+                           </button>
+                         </div>
+                       )}
+
+                       {/* Selection Summary Badge */}
+                       <div className="flex items-center justify-between mb-4 px-2">
+                          <div className="flex flex-col">
+                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Selection Length</span>
+                             <span className={`text-xl font-black ${(endTime - startTime) > MAX_DURATION ? 'text-red-600' : 'text-gray-900'}`}>
+                                {formatDuration(endTime - startTime)}
+                             </span>
+                          </div>
+                          {(endTime - startTime) > MAX_DURATION && (
+                             <div className="bg-red-50 text-red-600 px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+                                <AlertCircle className="h-3.5 w-3.5" />
+                                <span className="text-[10px] font-black uppercase tracking-tighter">Exceeds {formatDuration(MAX_DURATION)} Limit</span>
+                             </div>
+                          )}
+                       </div>
                       <div className={`flex flex-col sm:flex-row gap-4 ${!completedClip ? 'space-y-0' : ''}`}>
-                        <Button 
-                          onClick={handleClip} 
-                          disabled={processing || (endTime - startTime) <= 0} 
-                          className="w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 bg-[#5875F5] hover:bg-[#4763E4]"
-                        >
+                         <Button 
+                           onClick={handleClip} 
+                           disabled={processing || (endTime - startTime) <= 0} 
+                           className={`w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 ${
+                             (endTime - startTime) > MAX_DURATION && !processing
+                               ? 'bg-gray-300 hover:bg-gray-400 border-b-4 border-gray-900/20' 
+                               : 'bg-[#5875F5] hover:bg-[#4763E4]'
+                           }`}
+                         >
                           {processing ? (
                             <>
                               <Loader2 className="mr-3 h-7 w-7 animate-spin" />
-                              {format === 'mp3' ? 'CUTTING AUDIO...' : 'CUTTING VIDEO...'}
+                              {format === 'mp3' 
+                                ? 'CUTTING AUDIO...' 
+                                : 'CUTTING VIDEO...'}
                             </>
                           ) : (
                             <>
@@ -673,7 +728,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                   </div>
               ) : (
                   <div className="grid gap-4">
-                      {clips.map((clip) => (
+                      {clips.filter(c => c.status !== 'FAILED').map((clip) => (
                           <div key={clip.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm hover:shadow-md transition-all flex items-center gap-4 group">
                               <div className={`p-3 rounded-2xl ${clip.format === 'mp3' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
                                   {clip.format === 'mp3' ? <Music className="h-5 w-5" /> : <Video className="h-5 w-5" />}
@@ -695,14 +750,14 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                                               {formatFileSize(clip.fileSize)}
                                           </span>
                                       )}
-                                      <span className="ml-auto text-gray-300 font-bold">{getRelativeTime(clip.createdAt)}</span>
+                                      <span className="ml-auto text-gray-500 font-bold">{getRelativeTime(clip.createdAt)}</span>
                                   </div>
                               </div>
                               <div className="flex items-center gap-2">
                                   {clip.status === 'COMPLETED' && clip.downloadUrl ? (
                                       <a 
                                           href={clip.downloadUrl}
-                                          download={`${(clip.title || 'clip').replace(/[^a-z0-9]/gi, '_')}.${clip.format || 'mp4'}`}
+                                          download={`${(clip.title || 'clip').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_')}.${clip.format || 'mp4'}`}
                                           className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-2xl shadow-lg transition-all hover:scale-110"
                                       >
                                           <Download className="h-5 w-5" />
@@ -751,7 +806,7 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                           <AlertCircle className="w-10 h-10 stroke-[2.5]" />
                       </div>
                       
-                      <div className="space-y-2">
+                      <div className="space-y-4">
                           <h2 className="text-3xl font-black text-gray-900 tracking-tight">Clip Too Long!</h2>
                           <p className="text-gray-500 font-medium leading-relaxed">
                               The selected clip duration exceeds our current processing limit.

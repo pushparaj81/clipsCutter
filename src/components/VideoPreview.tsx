@@ -12,6 +12,7 @@ interface VideoPreviewProps {
 export interface VideoPlayerHandle {
   play: () => void;
   pause: () => void;
+  seek: (time: number) => void;
 }
 
 interface YouTubePlayer {
@@ -55,6 +56,15 @@ const VideoPreviewComponent = forwardRef<VideoPlayerHandle, VideoPreviewProps>(
           playerRef.current.pauseVideo();
         } catch {
           // Ignore errors
+        }
+      }
+    },
+    seek: (time: number) => {
+      if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
+        try {
+          playerRef.current.seekTo(time, true);
+        } catch {
+          // Ignore
         }
       }
     }
@@ -136,8 +146,8 @@ const VideoPreviewComponent = forwardRef<VideoPlayerHandle, VideoPreviewProps>(
                         onTimeUpdateRef.current(time);
                     }
 
-                    // Auto-pause at end
-                    if (typeof endTimeRef.current === 'number' && time >= endTimeRef.current) {
+                    // Auto-pause at end with a tiny buffer to avoid premature stops
+                    if (typeof endTimeRef.current === 'number' && time >= endTimeRef.current + 0.1) {
                         if (playerRef.current.pauseVideo) playerRef.current.pauseVideo();
                     }
                 }

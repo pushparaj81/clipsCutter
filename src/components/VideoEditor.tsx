@@ -104,7 +104,7 @@ const QualitySelect = ({
       
       {isOpen && (
         <div className="absolute top-full mt-2 left-0 w-full min-w-[140px] bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="max-h-[300px] overflow-y-auto">
+          <div className="max-h-[150px] overflow-y-auto">
             {options.map((opt) => (
               <button
                 key={opt.value}
@@ -347,19 +347,6 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
     try {
       const startTimeVal = startTime;
       const endTimeVal = endTime;
-      const duration = endTimeVal - startTimeVal;
-
-      // Client-side duration validation
-      if (duration > MAX_DURATION) {
-        setDurationLimitError({
-          current: formatDuration(duration),
-          max: formatDuration(MAX_DURATION),
-          message: `Your selection is ${formatDuration(duration)}, which exceeds our ${formatDuration(MAX_DURATION)} limit.`
-        });
-        setShowDurationModal(true);
-        setProcessing(false);
-        return;
-      }
 
       const res = await fetch('/api/clip', {
         method: 'POST',
@@ -641,27 +628,16 @@ export function VideoEditor({ videoId }: VideoEditorProps) {
                        {/* Selection Summary Badge */}
                        <div className="flex items-center justify-between mb-4 px-2">
                           <div className="flex flex-col">
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Selection Length</span>
-                             <span className={`text-xl font-black ${(endTime - startTime) > MAX_DURATION ? 'text-red-600' : 'text-gray-900'}`}>
-                                {formatDuration(endTime - startTime)}
+                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                SELECTION DURATION : <span className="text-gray-600 text-[14px]">{formatDuration(endTime - startTime)}</span>
                              </span>
                           </div>
-                          {(endTime - startTime) > MAX_DURATION && (
-                             <div className="bg-red-50 text-red-600 px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
-                                <AlertCircle className="h-3.5 w-3.5" />
-                                <span className="text-[10px] font-black uppercase tracking-tighter">Exceeds {formatDuration(MAX_DURATION)} Limit</span>
-                             </div>
-                          )}
                        </div>
                       <div className={`flex flex-col sm:flex-row gap-4 ${!completedClip ? 'space-y-0' : ''}`}>
                          <Button 
                            onClick={handleClip} 
                            disabled={processing || (endTime - startTime) <= 0} 
-                           className={`w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 ${
-                             (endTime - startTime) > MAX_DURATION && !processing
-                               ? 'bg-gray-300 hover:bg-gray-400 border-b-4 border-gray-900/20' 
-                               : 'bg-[#5875F5] hover:bg-[#4763E4]'
-                           }`}
+                           className="w-full h-16 text-xl font-black rounded-3xl shadow-2xl transition-all hover:-translate-y-1 active:scale-95 bg-[#5875F5] hover:bg-[#4763E4]"
                          >
                           {processing ? (
                             <>

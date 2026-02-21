@@ -25,13 +25,7 @@ async def create_clip(clip_data: ClipCreate, db: Session = Depends(get_db)):
         ClipResponse with job status
     """
     try:
-        # Additional validation
-        duration = clip_data.end_time - clip_data.start_time
-        if duration > settings.max_clip_duration:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Clip duration ({duration}s) exceeds maximum ({settings.max_clip_duration}s)"
-            )
+
         
         # Create database record
         clip_id = str(uuid.uuid4())
